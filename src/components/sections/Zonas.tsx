@@ -12,7 +12,7 @@ const ZONAS = [
 
 export default function Zonas() {
   return (
-    <section id="zonas" className="py-24" style={{ background: "#111110" }}>
+    <section id="zonas" className="py-24" style={{ background: "#FFFFFF" }}>
       <div className="se-container">
         <div className="grid lg:grid-cols-2 gap-20 items-start">
           {/* Left */}
@@ -22,55 +22,37 @@ export default function Zonas() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px w-12 bg-[#E07B10]" />
-              <span
-                className="font-body text-xs font-semibold tracking-[0.25em] uppercase"
-                style={{ color: "#E07B10" }}
-              >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-1 w-10" style={{ background: "#C41E2A", borderRadius: "2px" }} />
+              <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>
                 Dónde llegamos
               </span>
             </div>
-            <h2
-              className="font-display text-white leading-none mb-8"
-              style={{
-                fontSize: "clamp(2.5rem, 5vw, 4rem)",
-                letterSpacing: "0.02em",
-              }}
-            >
-              ZONA DE
-              <br />
-              ENTREGA.
+            <h2 className="font-display leading-none mb-6" style={{ fontSize: "clamp(2.4rem,5vw,3.8rem)", color: "#0D4A72", letterSpacing: "0.02em" }}>
+              ZONA DE<br />ENTREGA.
             </h2>
-            <p
-              className="font-body text-white/50 text-lg leading-relaxed mb-8"
-              style={{ fontWeight: 300 }}
-            >
+            <p className="font-body text-[#5A6A7E] text-lg leading-relaxed mb-8" style={{ fontWeight: 300 }}>
               Hacemos entregas en todo el GBA Sur con fletes propios.
-              Coordinamos el horario con vos. Para obras grandes,
-              consultá condiciones especiales.
+              Coordinamos horario con vos. Para obras grandes, consultá condiciones especiales.
             </p>
 
             <div
-              className="p-6"
+              className="p-6 mb-6"
               style={{
-                background: "rgba(224,123,16,0.1)",
-                border: "1px solid rgba(224,123,16,0.2)",
-                borderRadius: "2px",
+                background: "#F4F8FC",
+                border: "1px solid rgba(13,74,114,0.12)",
+                borderRadius: "4px",
+                borderLeft: "4px solid #0D4A72",
               }}
             >
               <div className="flex items-start gap-4">
-                <MapPin size={20} style={{ color: "#E07B10", marginTop: "2px", flexShrink: 0 }} />
+                <MapPin size={18} style={{ color: "#0D4A72", marginTop: "2px", flexShrink: 0 }} />
                 <div>
-                  <div className="font-body font-semibold text-white mb-1">
-                    Local principal
+                  <div className="font-body font-semibold text-[#0D4A72] mb-1">Local principal</div>
+                  <div className="font-body text-[#5A6A7E] text-sm">
+                    Dr. Carlos Collivadino 57, Temperley<br />Buenos Aires, Argentina
                   </div>
-                  <div className="font-body text-white/60 text-sm">
-                    Dr. Carlos Collivadino 57, Temperley
-                    <br />
-                    Buenos Aires, Argentina
-                  </div>
-                  <div className="font-body text-white/40 text-xs mt-2">
+                  <div className="font-body text-[#5A6A7E]/60 text-xs mt-2">
                     Lun–Vie 7:30–18hs · Sáb 7:30–13hs
                   </div>
                 </div>
@@ -81,7 +63,8 @@ export default function Zonas() {
               href="https://maps.google.com/?q=San+Eduardo+Design+Temperley"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-6 font-body text-sm font-semibold text-[#E07B10] hover:text-[#F59332] transition-colors"
+              className="inline-flex items-center gap-2 font-body text-sm font-semibold transition-colors"
+              style={{ color: "#C41E2A" }}
             >
               Ver en Google Maps →
             </a>
@@ -94,7 +77,7 @@ export default function Zonas() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {ZONAS.map((zona, i) => (
                 <motion.div
                   key={zona}
@@ -104,23 +87,18 @@ export default function Zonas() {
                   transition={{ duration: 0.3, delay: i * 0.04 }}
                   className="flex items-center gap-3 px-4 py-3"
                   style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: "2px",
+                    background: "#F4F8FC",
+                    border: "1px solid rgba(13,74,114,0.1)",
+                    borderRadius: "3px",
                   }}
                 >
-                  <div
-                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    style={{ background: "#E07B10" }}
-                  />
-                  <span className="font-body text-sm text-white/70">
-                    {zona}
-                  </span>
+                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#0D4A72" }} />
+                  <span className="font-body text-sm" style={{ color: "#0D2A3D" }}>{zona}</span>
                 </motion.div>
               ))}
             </div>
-            <p className="font-body text-white/30 text-xs mt-6 text-center">
-              ¿Tu zona no está en la lista? Consultanos — llegamos a más lugares.
+            <p className="font-body text-[#5A6A7E]/60 text-xs mt-5 text-center">
+              ¿Tu zona no está? Consultanos — llegamos a más lugares.
             </p>
           </motion.div>
         </div>

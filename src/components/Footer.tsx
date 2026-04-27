@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 const IconInstagram = () => (
@@ -21,30 +22,25 @@ const IconYoutube = () => (
 
 export default function Footer() {
   return (
-    <footer style={{ background: "#0A0A09", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+    <footer style={{ background: "#0A3055", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
       <div className="se-container py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Brand */}
           <div>
             <div className="mb-6">
-              <div
-                className="font-display text-white tracking-widest"
-                style={{ fontSize: "24px", letterSpacing: "0.15em" }}
-              >
-                SAN EDUARDO
-              </div>
-              <div
-                className="font-body text-[#E07B10] font-semibold uppercase tracking-[0.3em]"
-                style={{ fontSize: "9px" }}
-              >
-                DESIGN · DESDE 1964
-              </div>
+              <Image
+                src="/images/logo-white.png"
+                alt="San Eduardo Design"
+                width={160}
+                height={54}
+                className="h-12 w-auto"
+              />
             </div>
-            <p className="font-body text-white/35 text-sm leading-relaxed mb-6" style={{ fontWeight: 300 }}>
+            <p className="font-body text-white/40 text-sm leading-relaxed mb-6" style={{ fontWeight: 300 }}>
               Corralón de materiales de construcción en Temperley.
               Más de 60 años al servicio del GBA Sur.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {[
                 { icon: IconInstagram, href: "https://instagram.com/corralonsaneduardo", label: "Instagram" },
                 { icon: IconFacebook, href: "https://facebook.com/corralonsaneduardo", label: "Facebook" },
@@ -56,8 +52,8 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="w-9 h-9 flex items-center justify-center text-white/40 hover:text-[#E07B10] border border-white/10 hover:border-[#E07B10]/30 transition-all"
-                  style={{ borderRadius: "2px" }}
+                  className="w-9 h-9 flex items-center justify-center text-white/40 hover:text-white border border-white/15 hover:border-white/40 transition-all"
+                  style={{ borderRadius: "3px" }}
                 >
                   <s.icon />
                 </a>
@@ -67,22 +63,10 @@ export default function Footer() {
 
           {/* Links */}
           <div>
-            <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-6">
-              Navegación
-            </div>
+            <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-5">Navegación</div>
             <nav className="space-y-3">
-              {[
-                ["#rubros", "Rubros"],
-                ["#marcas", "Marcas"],
-                ["#nosotros", "Nosotros"],
-                ["#zonas", "Zona de entrega"],
-                ["#contacto", "Contacto"],
-              ].map(([href, label]) => (
-                <a
-                  key={href}
-                  href={href}
-                  className="block font-body text-sm text-white/45 hover:text-white transition-colors"
-                >
+              {[["#rubros","Rubros"],["#marcas","Marcas"],["#nosotros","Nosotros"],["#zonas","Zona de entrega"],["#contacto","Contacto"]].map(([href, label]) => (
+                <a key={href} href={href} className="block font-body text-sm text-white/45 hover:text-white transition-colors">
                   {label}
                 </a>
               ))}
@@ -91,32 +75,23 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-6">
-              Contacto directo
-            </div>
+            <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-5">Contacto directo</div>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <MapPin size={14} style={{ color: "#E07B10", marginTop: "3px", flexShrink: 0 }} />
+                <MapPin size={13} style={{ color: "#FFD700", marginTop: "3px", flexShrink: 0 }} />
                 <span className="font-body text-sm text-white/45 leading-relaxed">
-                  Dr. Carlos Collivadino 57
-                  <br />
-                  Temperley, Buenos Aires
+                  Dr. Carlos Collivadino 57<br />Temperley, Buenos Aires
                 </span>
               </div>
               <div className="flex items-start gap-3">
-                <Phone size={14} style={{ color: "#E07B10", marginTop: "3px", flexShrink: 0 }} />
+                <Phone size={13} style={{ color: "#FFD700", marginTop: "3px", flexShrink: 0 }} />
                 <div className="font-body text-sm text-white/45">
-                  4264-4848 / 4264-7638
-                  <br />
-                  4264-3889 / 4264-0194
+                  4264-4848 / 4264-7638<br />4264-3889 / 4264-0194
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Mail size={14} style={{ color: "#E07B10", marginTop: "3px", flexShrink: 0 }} />
-                <a
-                  href="mailto:info@saneduardodesign.com.ar"
-                  className="font-body text-sm text-white/45 hover:text-[#E07B10] transition-colors"
-                >
+                <Mail size={13} style={{ color: "#FFD700", marginTop: "3px", flexShrink: 0 }} />
+                <a href="mailto:info@saneduardodesign.com.ar" className="font-body text-sm text-white/45 hover:text-white transition-colors">
                   info@saneduardodesign.com.ar
                 </a>
               </div>
@@ -124,18 +99,13 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-white/05 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-14 pt-8 border-t border-white/08 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="font-body text-xs text-white/20">
             © {new Date().getFullYear()} San Eduardo Design. Todos los derechos reservados.
           </p>
           <p className="font-body text-xs text-white/15 text-center">
             Diseñado por{" "}
-            <a
-              href="https://tododeia.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white/40 transition-colors"
-            >
+            <a href="https://tododeia.com" target="_blank" rel="noopener noreferrer" className="hover:text-white/40 transition-colors">
               Tododeia
             </a>
           </p>

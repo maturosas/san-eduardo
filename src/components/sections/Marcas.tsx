@@ -8,82 +8,50 @@ const MARCAS = [
   "Loma Negra", "CEFAS", "Weber", "Plakor",
   "Cattáneo", "Cerámica San Lorenzo", "Hergo", "Orbis",
   "Sinteplast", "Akapol", "Isover", "Durlock",
-  "FV", "Rexel", "Glorisa", "Geka",
-  "Cormela", "Sipar", "Knauf", "Pirelli",
-  "Tubos Trans Electric", "Cambre", "Bticino", "Espiroflex",
+  "FV", "Glorisa", "Geka", "Cormela",
+  "Sipar", "Knauf", "Cambre", "Espiroflex",
+  "Portolan", "Porcelanato Del Conca", "Grecia", "Pisos del Sur",
 ];
 
 export default function Marcas() {
   return (
-    <section id="marcas" className="py-24 overflow-hidden" style={{ background: "#111110" }}>
-      <div className="se-container mb-16">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="h-px w-12 bg-[#E07B10]" />
-          <span
-            className="font-body text-xs font-semibold tracking-[0.25em] uppercase"
-            style={{ color: "#E07B10" }}
-          >
+    <section id="marcas" className="py-24 overflow-hidden" style={{ background: "#0D4A72" }}>
+      <div className="se-container mb-14">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="h-1 w-10" style={{ background: "#FFD700", borderRadius: "2px" }} />
+          <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#FFD700" }}>
             Con quiénes trabajamos
           </span>
         </div>
-        <h2
-          className="font-display text-white leading-none"
-          style={{
-            fontSize: "clamp(2.5rem, 5vw, 4rem)",
-            letterSpacing: "0.02em",
-          }}
-        >
+        <h2 className="font-display text-white leading-none" style={{ fontSize: "clamp(2.4rem,5vw,3.8rem)", letterSpacing: "0.02em" }}>
           MARCAS LÍDERES
         </h2>
-        <p
-          className="font-body text-white/45 text-lg mt-4 max-w-xl"
-          style={{ fontWeight: 300 }}
-        >
-          Trabajamos con más de 30 marcas reconocidas del mercado.
-          Calidad garantizada, disponibilidad real.
+        <p className="font-body text-white/50 text-lg mt-3 max-w-xl" style={{ fontWeight: 300 }}>
+          Más de 30 marcas reconocidas. Calidad garantizada, disponibilidad real.
         </p>
       </div>
 
-      {/* Scrolling strip */}
+      {/* Marquee */}
       <div className="relative">
-        <div
-          className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to right, #111110, transparent)",
-          }}
-        />
-        <div
-          className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to left, #111110, transparent)",
-          }}
-        />
+        <div className="absolute left-0 top-0 bottom-0 w-20 z-10 pointer-events-none"
+          style={{ background: "linear-gradient(to right, #0D4A72, transparent)" }} />
+        <div className="absolute right-0 top-0 bottom-0 w-20 z-10 pointer-events-none"
+          style={{ background: "linear-gradient(to left, #0D4A72, transparent)" }} />
 
-        <div className="flex gap-0 overflow-hidden">
+        <div className="flex overflow-hidden">
           <motion.div
-            className="flex gap-0 shrink-0"
+            className="flex shrink-0"
             animate={{ x: ["0%", "-50%"] }}
-            transition={{
-              duration: 40,
-              repeat: Infinity,
-              ease: "linear",
-            }}
+            transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
           >
-            {[...MARCAS, ...MARCAS].map((marca, i) => (
+            {[...MARCAS, ...MARCAS].map((m, i) => (
               <div
-                key={`${marca}-${i}`}
-                className="flex items-center px-8 py-5 whitespace-nowrap"
-                style={{
-                  borderRight: "1px solid rgba(255,255,255,0.06)",
-                }}
+                key={`${m}-${i}`}
+                className="flex items-center px-8 py-4 whitespace-nowrap"
+                style={{ borderRight: "1px solid rgba(255,255,255,0.08)" }}
               >
-                <span
-                  className="font-display tracking-widest text-white/40"
-                  style={{ fontSize: "1rem", letterSpacing: "0.12em" }}
-                >
-                  {marca.toUpperCase()}
+                <span className="font-display text-white/40 tracking-widest" style={{ fontSize: "0.95rem", letterSpacing: "0.1em" }}>
+                  {m.toUpperCase()}
                 </span>
               </div>
             ))}
@@ -91,20 +59,13 @@ export default function Marcas() {
         </div>
       </div>
 
-      {/* Grid visual */}
-      <div className="se-container mt-16">
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-px" style={{ background: "rgba(255,255,255,0.05)" }}>
-          {MARCAS.slice(0, 12).map((marca) => (
-            <div
-              key={marca}
-              className="flex items-center justify-center p-6 text-center"
-              style={{ background: "#111110" }}
-            >
-              <span
-                className="font-display text-white/30 text-sm tracking-widest"
-                style={{ letterSpacing: "0.08em" }}
-              >
-                {marca.toUpperCase()}
+      {/* Grid */}
+      <div className="se-container mt-14">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-px" style={{ background: "rgba(255,255,255,0.06)" }}>
+          {MARCAS.slice(0, 12).map((m) => (
+            <div key={m} className="flex items-center justify-center p-5 text-center" style={{ background: "#0D4A72" }}>
+              <span className="font-body text-white/40 text-xs font-semibold tracking-widest uppercase">
+                {m}
               </span>
             </div>
           ))}
