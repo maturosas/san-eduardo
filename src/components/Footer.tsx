@@ -64,8 +64,35 @@ export default function Footer() {
           {/* Links */}
           <div>
             <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-5">Navegación</div>
-            <nav className="space-y-3">
-              {[["/#rubros","Rubros"],["/#marcas","Marcas"],["/#nosotros","Nosotros"],["/#zonas","Zona de entrega"],["/#contacto","Contacto"],["blog","Blog"]].map(([href, label]) => (
+            <nav className="space-y-2.5">
+              {[
+                ["/#rubros","Rubros"],
+                ["/#nosotros","Nosotros"],
+                ["/#zonas","Zona de entrega"],
+                ["/#contacto","Contacto"],
+              ].map(([href, label]) => (
+                <a key={href} href={href} className="block font-body text-sm text-white/45 hover:text-white transition-colors">
+                  {label}
+                </a>
+              ))}
+            </nav>
+            <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-3 mt-6">Recursos</div>
+            <nav className="space-y-2.5">
+              {[
+                ["/blog","Blog"],
+                ["/faq","Preguntas frecuentes"],
+              ].map(([href, label]) => (
+                <a key={href} href={href} className="block font-body text-sm text-white/45 hover:text-white transition-colors">
+                  {label}
+                </a>
+              ))}
+            </nav>
+            <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-3 mt-6">Legal</div>
+            <nav className="space-y-2.5">
+              {[
+                ["/politica-de-privacidad","Política de privacidad"],
+                ["/politica-de-devoluciones","Política de devoluciones"],
+              ].map(([href, label]) => (
                 <a key={href} href={href} className="block font-body text-sm text-white/45 hover:text-white transition-colors">
                   {label}
                 </a>
