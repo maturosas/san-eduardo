@@ -85,6 +85,10 @@ export default function RubrosTab() {
         rubro_id: selectedRubro,
         name: editingItem.name,
         description: editingItem.description || "",
+        price: editingItem.price ?? null,
+        promo_price: editingItem.promo_price ?? null,
+        image_url: editingItem.image_url || null,
+        badge: editingItem.badge || "En construcción",
         active: editingItem.active ?? true,
         orden: editingItem.orden ?? 99,
       },
@@ -156,45 +160,68 @@ export default function RubrosTab() {
 
               {/* New/edit item form */}
               {editingItem && (editingItem._new || editingItem.rubro_id === r.id) && (
-                <div className="mb-3 p-3 space-y-2" style={{ background: "rgba(13,74,114,0.15)", border: "1px solid rgba(13,74,114,0.3)", borderRadius: "4px" }}>
-                  <input placeholder="Nombre del ítem *" value={editingItem.name || ""} onChange={e => setEditingItem(p => ({ ...p!, name: e.target.value }))} className={inputCls} />
-                  <textarea placeholder="Descripción (opcional)" value={editingItem.description || ""} onChange={e => setEditingItem(p => ({ ...p!, description: e.target.value }))} className={inputCls} rows={2} style={{ resize: "none" }} />
-                  <div className="flex gap-2 justify-end">
-                    <button onClick={() => setEditingItem(null)} className="font-body text-xs text-white/40 px-3 py-1.5"><X size={12} /></button>
-                    <button onClick={saveItem} disabled={saving || !editingItem.name} className="flex items-center gap-1 font-body text-xs font-semibold text-white px-3 py-1.5 disabled:opacity-40" style={{ background: "#0D4A72", borderRadius: "3px" }}>
-                      <Check size={12} /> {saving ? "..." : "Guardar"}
-                    </button>
-                  </div>
-                </div>
+                <ItemForm
+                  item={editingItem}
+                  saving={saving}
+                  onChange={setEditingItem}
+                  onSave={saveItem}
+                  onCancel={() => setEditingItem(null)}
+                  inputCls={inputCls}
+                />
               )}
 
               {/* Items list */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {(items[r.id] || []).length === 0 && !editingItem && (
-                  <p className="font-body text-xs text-white/25 py-2">Sin ítems cargados aún.</p>
+                  <p className="font-body text-xs text-white/25 py-2">Sin productos cargados aún. Agregá el primero.</p>
                 )}
                 {(items[r.id] || []).map(item => (
-                  <div key={item.id} className="flex items-start gap-2 px-3 py-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "3px" }}>
+                  <div key={item.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "4px" }}>
                     {editingItem && editingItem.id === item.id ? (
-                      <div className="flex-1 space-y-1.5">
-                        <input value={editingItem.name || ""} onChange={e => setEditingItem(p => ({ ...p!, name: e.target.value }))} className={inputCls} />
-                        <textarea value={editingItem.description || ""} onChange={e => setEditingItem(p => ({ ...p!, description: e.target.value }))} className={inputCls} rows={2} style={{ resize: "none" }} />
-                        <div className="flex gap-2 justify-end">
-                          <button onClick={() => setEditingItem(null)} className="font-body text-xs text-white/40 px-2 py-1"><X size={11} /></button>
-                          <button onClick={saveItem} disabled={saving} className="font-body text-xs font-semibold text-white px-3 py-1 disabled:opacity-40" style={{ background: "#0D4A72", borderRadius: "3px" }}>
-                            {saving ? "..." : "Guardar"}
-                          </button>
-                        </div>
+                      <div className="p-3">
+                        <ItemForm
+                          item={editingItem}
+                          saving={saving}
+                          onChange={setEditingItem}
+                          onSave={saveItem}
+                          onCancel={() => setEditingItem(null)}
+                          inputCls={inputCls}
+                        />
                       </div>
                     ) : (
-                      <>
+                      <div className="flex items-center gap-3 px-3 py-2.5">
+                        {/* Thumb */}
+                        {item.image_url ? (
+                          <img src={item.image_url} alt={item.name} className="w-10 h-10 object-cover flex-shrink-0" style={{ borderRadius: "3px" }} />
+                        ) : (
+                          <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center" style={{ background: "rgba(255,255,255,0.05)", borderRadius: "3px" }}>
+                            <span className="text-white/20 text-xs">SE</span>
+                          </div>
+                        )}
                         <div className="flex-1 min-w-0">
-                          <p className="font-body text-sm text-white/80">{item.name}</p>
-                          {item.description && <p className="font-body text-xs text-white/35 line-clamp-1">{item.description}</p>}
+                          <div className="flex items-center gap-2">
+                            <p className="font-body text-sm text-white/80 truncate">{item.name}</p>
+                            <span className="font-body text-xs px-1.5 py-0.5 flex-shrink-0" style={{ background: "rgba(13,74,114,0.3)", color: "#9DAEBF", borderRadius: "3px" }}>
+                              {item.badge || "En construcción"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3 mt-0.5">
+                            {item.promo_price ? (
+                              <span className="font-body text-xs font-semibold" style={{ color: "#C41E2A" }}>
+                                ${item.promo_price.toLocaleString("es-AR")}
+                                {item.price && <span className="line-through ml-1 text-white/30">${item.price.toLocaleString("es-AR")}</span>}
+                              </span>
+                            ) : item.price ? (
+                              <span className="font-body text-xs font-semibold text-white/60">${item.price.toLocaleString("es-AR")}</span>
+                            ) : (
+                              <span className="font-body text-xs text-white/25">Sin precio</span>
+                            )}
+                            {item.description && <span className="font-body text-xs text-white/25 truncate">{item.description}</span>}
+                          </div>
                         </div>
-                        <button onClick={() => setEditingItem({ ...item })} className="p-1 text-white/30 hover:text-white/70 transition-colors flex-shrink-0"><Pencil size={12} /></button>
-                        <button onClick={() => deleteItem(item.id, r.id)} className="p-1 text-white/30 hover:text-red-400 transition-colors flex-shrink-0"><Trash2 size={12} /></button>
-                      </>
+                        <button onClick={() => setEditingItem({ ...item })} className="p-1.5 text-white/30 hover:text-white transition-colors"><Pencil size={12} /></button>
+                        <button onClick={() => deleteItem(item.id, r.id)} className="p-1.5 text-white/30 hover:text-red-400 transition-colors"><Trash2 size={12} /></button>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -259,4 +286,98 @@ export default function RubrosTab() {
 
 function toSlug(str: string) {
   return str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+const BADGES = ["En construcción", "Disponible", "Nuevo", "Oferta", "Sin stock"];
+
+function ItemForm({
+  item, saving, onChange, onSave, onCancel, inputCls
+}: {
+  item: EditingItem;
+  saving: boolean;
+  onChange: React.Dispatch<React.SetStateAction<EditingItem | null>>;
+  onSave: () => void;
+  onCancel: () => void;
+  inputCls: string;
+}) {
+  return (
+    <div className="space-y-2 p-3" style={{ background: "rgba(13,74,114,0.15)", border: "1px solid rgba(13,74,114,0.3)", borderRadius: "4px" }}>
+      {/* Row 1: nombre + badge */}
+      <div className="grid grid-cols-2 gap-2">
+        <input
+          placeholder="Nombre del producto *"
+          value={item.name || ""}
+          onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, name: v } : p); }}
+          className={inputCls}
+        />
+        <select
+          value={item.badge || "En construcción"}
+          onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, badge: v } : p); }}
+          className={inputCls}
+        >
+          {BADGES.map(b => <option key={b} value={b}>{b}</option>)}
+        </select>
+      </div>
+
+      {/* Row 2: descripción */}
+      <textarea
+        placeholder="Descripción (opcional)"
+        value={item.description || ""}
+        onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, description: v } : p); }}
+        className={inputCls}
+        rows={2}
+        style={{ resize: "none" }}
+      />
+
+      {/* Row 3: precios */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="font-body text-xs text-white/35 mb-1 block">Precio ($)</label>
+          <input
+            type="number"
+            placeholder="Ej: 15000"
+            value={item.price ?? ""}
+            onChange={e => { const v = e.target.value ? Number(e.target.value) : null; onChange(p => p ? { ...p, price: v } : p); }}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="font-body text-xs text-white/35 mb-1 block">Precio promo ($) — opcional</label>
+          <input
+            type="number"
+            placeholder="Ej: 12000"
+            value={item.promo_price ?? ""}
+            onChange={e => { const v = e.target.value ? Number(e.target.value) : null; onChange(p => p ? { ...p, promo_price: v } : p); }}
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      {/* Row 4: imagen */}
+      <input
+        placeholder="URL de imagen (https://...)"
+        value={item.image_url || ""}
+        onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, image_url: v } : p); }}
+        className={inputCls}
+      />
+      {item.image_url && (
+        <img src={item.image_url} alt="preview" className="h-20 w-auto object-cover" style={{ borderRadius: "3px" }} />
+      )}
+
+      {/* Actions */}
+      <div className="flex gap-2 justify-end pt-1">
+        <button onClick={onCancel} className="font-body text-xs text-white/40 px-3 py-1.5">
+          <X size={12} />
+        </button>
+        <button
+          onClick={onSave}
+          disabled={saving || !item.name}
+          className="flex items-center gap-1 font-body text-xs font-semibold text-white px-4 py-1.5 disabled:opacity-40"
+          style={{ background: "#0D4A72", borderRadius: "3px" }}
+        >
+          <Check size={12} /> {saving ? "Guardando..." : "Guardar producto"}
+        </button>
+      </div>
+    </div>
+  );
 }

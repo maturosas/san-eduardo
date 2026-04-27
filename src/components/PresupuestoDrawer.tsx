@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Minus, Plus, Trash2, Send, ShoppingList } from "lucide-react";
+import { X, Minus, Plus, Trash2, Send, ClipboardList } from "lucide-react";
 import { usePresupuesto } from "@/context/PresupuestoContext";
 
 function formatPrecio(p: number) {
@@ -65,7 +65,7 @@ export default function PresupuestoDrawer() {
               boxShadow: "0 8px 24px rgba(13,74,114,0.4)",
             }}
           >
-            <ShoppingList size={16} />
+            <ClipboardList size={16} />
             Presupuesto
             <span
               className="flex items-center justify-center w-5 h-5 font-body text-xs font-black"

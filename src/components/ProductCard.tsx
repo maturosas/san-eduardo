@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MessageCircle, ShoppingList, Check } from "lucide-react";
+import { MessageCircle, ClipboardList, Check } from "lucide-react";
 import { usePresupuesto, PresupuestoItem } from "@/context/PresupuestoContext";
 import { getWhatsAppUrlByRubro } from "@/lib/whatsapp";
 
@@ -138,7 +138,7 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
             {added ? (
               <><Check size={14} /> Agregado al presupuesto</>
             ) : (
-              <><ShoppingList size={14} /> Agregar al presupuesto</>
+              <><ClipboardList size={14} /> Agregar al presupuesto</>
             )}
           </button>
           <a

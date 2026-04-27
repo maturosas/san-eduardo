@@ -17,6 +17,10 @@ export type RubroItem = {
   rubro_id: string;
   name: string;
   description: string;
+  price: number | null;
+  promo_price: number | null;
+  image_url: string | null;
+  badge: string;
   active: boolean;
   orden: number;
 };
@@ -49,5 +53,6 @@ export type Consulta = {
   zona: string | null;
   mensaje: string;
   estado: "nueva" | "en_contacto" | "resuelta";
+  presupuesto_items: string | null;
   created_at: string;
 };

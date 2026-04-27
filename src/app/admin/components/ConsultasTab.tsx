@@ -118,6 +118,38 @@ export default function ConsultasTab() {
                   <div>
                     <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-2">Mensaje</div>
                     <p className="font-body text-sm text-white/65 leading-relaxed">{c.mensaje}</p>
+                    {c.presupuesto_items && (() => {
+                      try {
+                        const items = JSON.parse(c.presupuesto_items);
+                        if (!items?.length) return null;
+                        const total = items.reduce((a: number, i: {precio?: number; cantidad?: number}) => a + ((i.precio || 0) * (i.cantidad || 1)), 0);
+                        return (
+                          <div className="mt-3">
+                            <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-2">Productos solicitados</div>
+                            <div className="space-y-1.5">
+                              {items.map((item: {nombre: string; rubro: string; cantidad: number; precio?: number}, idx: number) => (
+                                <div key={idx} className="flex items-center justify-between px-3 py-2" style={{ background: "rgba(13,74,114,0.25)", borderRadius: "3px" }}>
+                                  <div>
+                                    <span className="font-body text-xs font-semibold text-white/80">{item.nombre}</span>
+                                    <span className="font-body text-xs text-white/35 ml-2">{item.rubro}</span>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className="font-body text-xs text-white/50">×{item.cantidad}</span>
+                                    {item.precio ? <span className="font-body text-xs font-semibold" style={{ color: "#E07B10" }}>${(item.precio * item.cantidad).toLocaleString("es-AR")}</span> : null}
+                                  </div>
+                                </div>
+                              ))}
+                              {total > 0 && (
+                                <div className="flex justify-between px-3 pt-1">
+                                  <span className="font-body text-xs text-white/35">Total estimado</span>
+                                  <span className="font-body text-sm font-bold" style={{ color: "#E07B10" }}>${total.toLocaleString("es-AR")}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      } catch { return null; }
+                    })()}
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/06 items-center">
