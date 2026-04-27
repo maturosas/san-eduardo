@@ -8,10 +8,12 @@ import {
   ChevronDown, ChevronUp, Search
 } from "lucide-react";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+  );
+}
 
 type Consulta = {
   id: string;
@@ -66,6 +68,7 @@ export default function AdminPage() {
 
   const loadConsultas = useCallback(async () => {
     setLoading(true);
+    const supabase = getSupabase();
     const { data } = await supabase
       .from("consultas")
       .select("*")
@@ -79,6 +82,7 @@ export default function AdminPage() {
   }, [auth, loadConsultas]);
 
   const updateEstado = async (id: string, estado: Consulta["estado"]) => {
+    const supabase = getSupabase();
     await supabase.from("consultas").update({ estado }).eq("id", id);
     setConsultas((prev) =>
       prev.map((c) => (c.id === id ? { ...c, estado } : c))
