@@ -2,18 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { ArrowRight, MapPin, Clock, ChevronDown } from "lucide-react";
+import { ArrowRight, MapPin, Clock, Phone } from "lucide-react";
 
 const SLIDES = [
   {
     img: "/images/showroom.jpg",
     headline: ["TODO LO QUE", "TU OBRA", "NECESITA."],
-    sub: "Más de 15.000 artículos en stock. Marcas líderes. Asesoramiento real.",
+    sub: "Más de 15.000 artículos en stock. Marcas líderes. Asesoramiento real de quienes conocen el rubro.",
   },
   {
     img: "/images/construccion.jpg",
     headline: ["60 AÑOS", "CONSTRUYENDO", "LA ZONA SUR."],
-    sub: "Tres generaciones al servicio de la construcción en el GBA Sur.",
+    sub: "Tres generaciones al servicio de arquitectos, constructores y propietarios del GBA Sur.",
   },
 ];
 
@@ -21,99 +21,87 @@ export default function Hero() {
   const [current, setCurrent] = useState(0);
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
-  // Auto-slide
   useEffect(() => {
-    const t = setInterval(() => setCurrent((c) => (c + 1) % SLIDES.length), 5000);
+    const t = setInterval(() => setCurrent((c) => (c + 1) % SLIDES.length), 5500);
     return () => clearInterval(t);
   }, []);
 
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Parallax background slides */}
+    <section
+      ref={ref}
+      className="relative flex items-center overflow-hidden"
+      style={{ height: "clamp(560px, 82vh, 780px)" }}
+    >
+      {/* Background slides */}
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
           className="absolute inset-0"
-          initial={{ opacity: 0, scale: 1.06 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.0, ease: "easeInOut" }}
           style={{ y: bgY }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={SLIDES[current].img}
-            alt=""
-            className="w-full h-full object-cover"
-            style={{ height: "115%" }}
+          {/* Using background-image for crisp rendering at any size */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${SLIDES[current].img})`,
+              backgroundSize: "cover",
+              backgroundPosition: current === 0 ? "center 40%" : "center center",
+              height: "110%",
+              top: "-5%",
+            }}
           />
         </motion.div>
       </AnimatePresence>
 
-      {/* Gradient overlays */}
+      {/* Overlays */}
       <div
         className="absolute inset-0 z-10"
         style={{
-          background: "linear-gradient(to right, rgba(13,74,114,0.88) 0%, rgba(13,74,114,0.65) 50%, rgba(13,74,114,0.3) 100%)",
-        }}
-      />
-      <div
-        className="absolute bottom-0 left-0 right-0 h-40 z-10"
-        style={{
-          background: "linear-gradient(to top, rgba(13,74,114,0.6), transparent)",
+          background: "linear-gradient(105deg, rgba(13,74,114,0.90) 0%, rgba(13,74,114,0.70) 55%, rgba(13,74,114,0.35) 100%)",
         }}
       />
 
       {/* Content */}
-      <motion.div
-        style={{ opacity }}
-        className="relative z-20 se-container w-full pt-28 pb-20"
-      >
-        <div className="max-w-3xl">
-          {/* Badge */}
+      <div className="relative z-20 se-container w-full pt-20">
+        <div className="max-w-2xl">
+          {/* Eyebrow */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 mb-8 px-4 py-2"
-            style={{
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              borderRadius: "3px",
-              backdropFilter: "blur(8px)",
-            }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center gap-3 mb-6"
           >
+            <div className="h-0.5 w-8" style={{ background: "#FFD700" }} />
             <span
-              className="font-body text-xs font-bold uppercase tracking-[0.2em]"
-              style={{ color: "#FFB3B8" }}
+              className="font-body text-xs font-bold tracking-[0.22em] uppercase"
+              style={{ color: "#FFD700" }}
             >
-              DESDE 1964
-            </span>
-            <span className="w-px h-3 bg-white/30" />
-            <span className="font-body text-xs text-white/70 tracking-wider">
-              Temperley · GBA Sur
+              San Eduardo Design · Desde 1964
             </span>
           </motion.div>
 
-          {/* Headline — animated per slide */}
+          {/* Headline */}
           <AnimatePresence mode="wait">
             <motion.h1
               key={`h-${current}`}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display text-white leading-none mb-6"
-              style={{ fontSize: "clamp(3.2rem, 8vw, 6.5rem)", letterSpacing: "0.02em" }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className="font-display text-white leading-none mb-5"
+              style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", letterSpacing: "0.03em" }}
             >
               {SLIDES[current].headline.map((line, i) => (
                 <span key={i} className="block">
-                  {i === 1 ? (
-                    <span style={{ color: "#FFD700" }}>{line}</span>
-                  ) : line}
+                  {i === 1
+                    ? <span style={{ color: "#FFD700" }}>{line}</span>
+                    : line}
                 </span>
               ))}
             </motion.h1>
@@ -125,9 +113,9 @@ export default function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="font-body text-white/70 text-lg leading-relaxed mb-10 max-w-lg"
-              style={{ fontWeight: 300 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="font-body text-white/65 leading-relaxed mb-8"
+              style={{ fontSize: "1.05rem", fontWeight: 300, maxWidth: "480px" }}
             >
               {SLIDES[current].sub}
             </motion.p>
@@ -135,83 +123,90 @@ export default function Hero() {
 
           {/* CTAs */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-4"
+            transition={{ duration: 0.5, delay: 0.25 }}
+            className="flex flex-wrap gap-3 mb-10"
           >
             <a
               href="#contacto"
-              className="inline-flex items-center justify-center gap-2 font-body font-semibold text-sm px-8 py-4 text-white group transition-all"
-              style={{ background: "#C41E2A", borderRadius: "3px" }}
+              className="inline-flex items-center gap-2 font-body font-bold text-sm px-7 py-3.5 text-white group transition-all hover:opacity-90 shadow-lg"
+              style={{
+                background: "#C41E2A",
+                borderRadius: "4px",
+                boxShadow: "0 4px 16px rgba(196,30,42,0.4)",
+              }}
             >
               Pedir presupuesto
-              <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a
-              href="https://api.whatsapp.com/send?phone=5491121613339&text=Hola%2C%20quiero%20consultar%20sobre%20materiales"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 font-body font-semibold text-sm px-8 py-4 text-white hover:bg-white/10 transition-all"
-              style={{ border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: "3px" }}
+              href="#rubros"
+              className="inline-flex items-center gap-2 font-body font-semibold text-sm px-7 py-3.5 text-white hover:bg-white/15 transition-all"
+              style={{ border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: "4px" }}
             >
-              WhatsApp →
+              Ver rubros →
+            </a>
+            <a
+              href="tel:+541142644848"
+              className="hidden sm:inline-flex items-center gap-2 font-body font-semibold text-sm px-5 py-3.5 text-white/80 hover:text-white transition-colors"
+            >
+              <Phone size={13} />
+              4264-4848
             </a>
           </motion.div>
-        </div>
 
-        {/* Stats bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-px"
-          style={{ background: "rgba(255,255,255,0.1)" }}
-        >
-          {[
-            { num: "60+", label: "Años en el rubro" },
-            { num: "15.000", label: "Artículos en stock" },
-            { num: "7.500 m²", label: "Depósito propio" },
-            { num: "30+", label: "Marcas líderes" },
-          ].map((s) => (
-            <div
-              key={s.label}
-              className="text-center py-5 px-4"
-              style={{ background: "rgba(13,74,114,0.5)", backdropFilter: "blur(8px)" }}
-            >
-              <div
-                className="font-display text-3xl text-white mb-1"
-                style={{ letterSpacing: "0.03em" }}
-              >
-                {s.num}
-              </div>
-              <div className="font-body text-xs text-white/55 tracking-wide">
-                {s.label}
-              </div>
+          {/* Info strip */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-4"
+          >
+            <div className="flex items-center gap-2 text-white/50">
+              <MapPin size={12} style={{ color: "#FFD700", flexShrink: 0 }} />
+              <span className="font-body text-xs">Dr. Carlos Collivadino 57, Temperley</span>
             </div>
-          ))}
-        </motion.div>
+            <div className="flex items-center gap-2 text-white/50">
+              <Clock size={12} style={{ color: "#FFD700", flexShrink: 0 }} />
+              <span className="font-body text-xs">Lun–Vie 7:30–18hs · Sáb 7:30–13hs</span>
+            </div>
+          </motion.div>
+        </div>
+      </div>
 
-        {/* Bottom info */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
-          className="mt-8 flex flex-col sm:flex-row gap-5"
-        >
-          <div className="flex items-center gap-2 text-white/50">
-            <MapPin size={13} style={{ color: "#FFD700" }} />
-            <span className="font-body text-sm">Dr. Carlos Collivadino 57, Temperley</span>
+      {/* Stats bar — fijo al fondo */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.7, delay: 0.5 }}
+        className="absolute bottom-0 left-0 right-0 z-20 grid grid-cols-2 sm:grid-cols-4"
+      >
+        {[
+          { num: "60+", label: "Años en el rubro" },
+          { num: "15.000", label: "Artículos en stock" },
+          { num: "7.500 m²", label: "Depósito propio" },
+          { num: "30+", label: "Marcas líderes" },
+        ].map((s, i) => (
+          <div
+            key={s.label}
+            className="text-center py-4 px-3"
+            style={{
+              background: i % 2 === 0 ? "rgba(13,74,114,0.88)" : "rgba(10,60,90,0.88)",
+              backdropFilter: "blur(8px)",
+              borderTop: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            <div className="font-display text-2xl text-white" style={{ letterSpacing: "0.03em" }}>
+              {s.num}
+            </div>
+            <div className="font-body text-xs text-white/50 mt-0.5">{s.label}</div>
           </div>
-          <div className="flex items-center gap-2 text-white/50">
-            <Clock size={13} style={{ color: "#FFD700" }} />
-            <span className="font-body text-sm">Lun–Vie 7:30–18hs · Sáb 7:30–13hs</span>
-          </div>
-        </motion.div>
+        ))}
       </motion.div>
 
-      {/* Slide dots */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      {/* Slide indicators */}
+      <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
         {SLIDES.map((_, i) => (
           <button
             key={i}
@@ -219,26 +214,14 @@ export default function Hero() {
             aria-label={`Slide ${i + 1}`}
             className="transition-all duration-300"
             style={{
-              width: i === current ? "28px" : "8px",
-              height: "8px",
-              borderRadius: "4px",
-              background: i === current ? "#C41E2A" : "rgba(255,255,255,0.4)",
+              width: "6px",
+              height: i === current ? "28px" : "6px",
+              borderRadius: "3px",
+              background: i === current ? "#C41E2A" : "rgba(255,255,255,0.35)",
             }}
           />
         ))}
       </div>
-
-      {/* Scroll cue */}
-      <motion.div
-        className="absolute bottom-8 right-8 z-20 hidden md:flex flex-col items-center gap-2"
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        <span className="font-body text-xs text-white/40 tracking-widest uppercase rotate-90 origin-center mb-2">
-          Scroll
-        </span>
-        <ChevronDown size={16} className="text-white/40" />
-      </motion.div>
     </section>
   );
 }
