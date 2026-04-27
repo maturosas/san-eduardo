@@ -17,6 +17,19 @@ export type ProductCardData = {
   rubroSlug: string;
 };
 
+function getBadgeColor(badge: string): string {
+  switch (badge) {
+    case "Disponible": return "#10B981";
+    case "Más usado": return "#0D4A72";
+    case "Más conveniente": return "#1A6B9A";
+    case "Nuevo": return "#4F46E5";
+    case "Oferta": return "#C41E2A";
+    case "Sin stock": return "#6B7280";
+    case "Consultar precio": return "#5A6A7E";
+    default: return "#0D4A72";
+  }
+}
+
 function formatPrecio(p: number) {
   return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(p);
 }
@@ -74,7 +87,7 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
         <div
           className="absolute top-3 left-3 font-body text-xs font-bold px-2.5 py-1 uppercase tracking-wider"
           style={{
-            background: product.badge === "Disponible" ? "#10B981" : "#0D4A72",
+            background: getBadgeColor(product.badge),
             color: "#FFFFFF",
             borderRadius: "3px",
           }}

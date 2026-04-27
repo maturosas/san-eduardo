@@ -288,7 +288,7 @@ function toSlug(str: string) {
   return str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-const BADGES = ["En construcción", "Disponible", "Nuevo", "Oferta", "Sin stock"];
+const BADGES = ["En construcción", "Disponible", "Más usado", "Más conveniente", "Nuevo", "Oferta", "Sin stock", "Consultar precio"];
 
 function ItemForm({
   item, saving, onChange, onSave, onCancel, inputCls

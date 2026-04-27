@@ -122,7 +122,7 @@ export default function PresupuestoDrawer() {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
               {status === "ok" ? (
                 <div className="flex flex-col items-center justify-center h-full text-center px-8">
                   <div className="font-display text-5xl mb-3" style={{ color: "#0D4A72", letterSpacing: "0.05em" }}>¡LISTO!</div>

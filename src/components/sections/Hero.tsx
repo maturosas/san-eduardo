@@ -17,6 +17,13 @@ const SLIDES = [
   },
 ];
 
+const STATS = [
+  { num: "60+", label: "Años" },
+  { num: "15.000", label: "Artículos" },
+  { num: "7.500 m²", label: "Depósito" },
+  { num: "30+", label: "Marcas" },
+];
+
 export default function Hero() {
   const [current, setCurrent] = useState(0);
   const ref = useRef<HTMLElement>(null);
@@ -32,9 +39,9 @@ export default function Hero() {
     <section
       ref={ref}
       className="relative flex items-center overflow-hidden"
-      style={{ height: "clamp(560px, 82vh, 780px)" }}
+      style={{ height: "clamp(520px, 85vh, 780px)" }}
     >
-      {/* Background slides */}
+      {/* Background */}
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -45,7 +52,6 @@ export default function Hero() {
           transition={{ duration: 1.0, ease: "easeInOut" }}
           style={{ y: bgY }}
         >
-          {/* Using background-image for crisp rendering at any size */}
           <div
             className="absolute inset-0"
             style={{
@@ -59,29 +65,24 @@ export default function Hero() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Overlays */}
+      {/* Overlay */}
       <div
         className="absolute inset-0 z-10"
-        style={{
-          background: "linear-gradient(105deg, rgba(13,74,114,0.90) 0%, rgba(13,74,114,0.70) 55%, rgba(13,74,114,0.35) 100%)",
-        }}
+        style={{ background: "linear-gradient(105deg, rgba(13,74,114,0.92) 0%, rgba(13,74,114,0.72) 55%, rgba(13,74,114,0.35) 100%)" }}
       />
 
       {/* Content */}
-      <div className="relative z-20 se-container w-full pt-20">
+      <div className="relative z-20 se-container w-full" style={{ paddingTop: "80px" }}>
         <div className="max-w-2xl">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex items-center gap-3 mb-6"
+            className="flex items-center gap-3 mb-5"
           >
             <div className="h-0.5 w-8" style={{ background: "#FFD700" }} />
-            <span
-              className="font-body text-xs font-bold tracking-[0.22em] uppercase"
-              style={{ color: "#FFD700" }}
-            >
+            <span className="font-body text-xs font-bold tracking-[0.2em] uppercase" style={{ color: "#FFD700" }}>
               San Eduardo Design · Desde 1964
             </span>
           </motion.div>
@@ -94,14 +95,12 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display text-white leading-none mb-5"
-              style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", letterSpacing: "0.03em" }}
+              className="font-display text-white leading-none mb-4"
+              style={{ fontSize: "clamp(2.2rem, 7vw, 5.5rem)", letterSpacing: "0.03em" }}
             >
               {SLIDES[current].headline.map((line, i) => (
                 <span key={i} className="block">
-                  {i === 1
-                    ? <span style={{ color: "#FFD700" }}>{line}</span>
-                    : line}
+                  {i === 1 ? <span style={{ color: "#FFD700" }}>{line}</span> : line}
                 </span>
               ))}
             </motion.h1>
@@ -114,8 +113,8 @@ export default function Hero() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="font-body text-white/65 leading-relaxed mb-8"
-              style={{ fontSize: "1.05rem", fontWeight: 300, maxWidth: "480px" }}
+              className="font-body text-white/65 leading-relaxed mb-7"
+              style={{ fontSize: "clamp(0.95rem, 2vw, 1.05rem)", fontWeight: 300, maxWidth: "480px" }}
             >
               {SLIDES[current].sub}
             </motion.p>
@@ -126,33 +125,28 @@ export default function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
-            className="flex flex-wrap gap-3 mb-10"
+            className="flex flex-wrap gap-3 mb-8"
           >
             <a
               href="#contacto"
-              className="inline-flex items-center gap-2 font-body font-bold text-sm px-7 py-3.5 text-white group transition-all hover:opacity-90 shadow-lg"
-              style={{
-                background: "#C41E2A",
-                borderRadius: "4px",
-                boxShadow: "0 4px 16px rgba(196,30,42,0.4)",
-              }}
+              className="inline-flex items-center justify-center gap-2 font-body font-bold text-sm px-6 py-3.5 text-white group transition-all hover:opacity-90"
+              style={{ background: "#C41E2A", borderRadius: "4px", boxShadow: "0 4px 16px rgba(196,30,42,0.4)" }}
             >
               Pedir presupuesto
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a
               href="#rubros"
-              className="inline-flex items-center gap-2 font-body font-semibold text-sm px-7 py-3.5 text-white hover:bg-white/15 transition-all"
+              className="inline-flex items-center justify-center gap-2 font-body font-semibold text-sm px-6 py-3.5 text-white hover:bg-white/15 transition-all"
               style={{ border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: "4px" }}
             >
               Ver rubros →
             </a>
             <a
               href="tel:+541142644848"
-              className="hidden sm:inline-flex items-center gap-2 font-body font-semibold text-sm px-5 py-3.5 text-white/80 hover:text-white transition-colors"
+              className="hidden sm:inline-flex items-center gap-2 font-body font-semibold text-sm px-4 py-3.5 text-white/75 hover:text-white transition-colors"
             >
-              <Phone size={13} />
-              4264-4848
+              <Phone size={13} /> 4264-4848
             </a>
           </motion.div>
 
@@ -161,11 +155,11 @@ export default function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-6"
           >
             <div className="flex items-center gap-2 text-white/50">
               <MapPin size={12} style={{ color: "#FFD700", flexShrink: 0 }} />
-              <span className="font-body text-xs">Dr. Carlos Collivadino 57, Temperley</span>
+              <span className="font-body text-xs">Collivadino 57, Temperley</span>
             </div>
             <div className="flex items-center gap-2 text-white/50">
               <Clock size={12} style={{ color: "#FFD700", flexShrink: 0 }} />
@@ -175,49 +169,42 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Stats bar — fijo al fondo */}
+      {/* Stats bar */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.7, delay: 0.5 }}
         className="absolute bottom-0 left-0 right-0 z-20 grid grid-cols-2 sm:grid-cols-4"
       >
-        {[
-          { num: "60+", label: "Años en el rubro" },
-          { num: "15.000", label: "Artículos en stock" },
-          { num: "7.500 m²", label: "Depósito propio" },
-          { num: "30+", label: "Marcas líderes" },
-        ].map((s, i) => (
+        {STATS.map((s, i) => (
           <div
             key={s.label}
-            className="text-center py-4 px-3"
+            className="text-center py-3 sm:py-4 px-3"
             style={{
               background: i % 2 === 0 ? "rgba(13,74,114,0.88)" : "rgba(10,60,90,0.88)",
               backdropFilter: "blur(8px)",
               borderTop: "1px solid rgba(255,255,255,0.1)",
             }}
           >
-            <div className="font-display text-2xl text-white" style={{ letterSpacing: "0.03em" }}>
-              {s.num}
-            </div>
+            <div className="font-display text-xl sm:text-2xl text-white" style={{ letterSpacing: "0.03em" }}>{s.num}</div>
             <div className="font-body text-xs text-white/50 mt-0.5">{s.label}</div>
           </div>
         ))}
       </motion.div>
 
       {/* Slide indicators */}
-      <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
+      <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
         {SLIDES.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
             aria-label={`Slide ${i + 1}`}
-            className="transition-all duration-300"
             style={{
               width: "6px",
               height: i === current ? "28px" : "6px",
               borderRadius: "3px",
               background: i === current ? "#C41E2A" : "rgba(255,255,255,0.35)",
+              transition: "all 0.3s",
             }}
           />
         ))}

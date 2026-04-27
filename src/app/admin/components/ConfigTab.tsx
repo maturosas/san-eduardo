@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { SiteConfig } from "@/types";
-import { Check, RefreshCw, BarChart3, Settings2, Eye, EyeOff } from "lucide-react";
+import { Check, RefreshCw, BarChart3, Settings2, Eye, EyeOff, Share2 } from "lucide-react";
 
 async function adminPost(action: string, payload: object) {
   const res = await fetch("/api/admin", {
@@ -14,6 +14,7 @@ async function adminPost(action: string, payload: object) {
 }
 
 const ANALYTICS_KEYS = ["analytics_ga4_id", "analytics_meta_pixel_id", "analytics_clarity_id"];
+const OG_KEYS = ["og_title", "og_description", "og_image_url"];
 
 const ANALYTICS_HELP: Record<string, { label: string; placeholder: string; help: string }> = {
   analytics_ga4_id: {
@@ -39,7 +40,7 @@ export default function ConfigTab() {
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
-  const [activeSection, setActiveSection] = useState<"general" | "analytics">("general");
+  const [activeSection, setActiveSection] = useState<"general" | "og" | "analytics">("general");
 
   useEffect(() => { load(); }, []);
 
@@ -61,7 +62,7 @@ export default function ConfigTab() {
     setTimeout(() => setSaved(null), 2500);
   };
 
-  const generalConfig = config.filter(c => !ANALYTICS_KEYS.includes(c.key));
+  const generalConfig = config.filter(c => !ANALYTICS_KEYS.includes(c.key) && !OG_KEYS.includes(c.key));
   const analyticsConfig = config.filter(c => ANALYTICS_KEYS.includes(c.key));
 
   if (loading) return <div className="text-center py-12 font-body text-white/30">Cargando configuración...</div>;
@@ -130,7 +131,8 @@ export default function ConfigTab() {
       <div className="flex gap-2 mb-7">
         {[
           { id: "general" as const, label: "Textos del sitio", icon: Settings2 },
-          { id: "analytics" as const, label: "Tracking & Analytics", icon: BarChart3 },
+          { id: "og" as const, label: "Compartir en redes", icon: Share2 },
+          { id: "analytics" as const, label: "Analytics", icon: BarChart3 },
         ].map(s => (
           <button
             key={s.id}
@@ -156,6 +158,46 @@ export default function ConfigTab() {
             Editá los textos del sitio. Los cambios se reflejan automáticamente.
           </p>
           {generalConfig.map(item => renderField(item, false))}
+        </div>
+      )}
+
+      {/* OG / Social snippet config */}
+      {activeSection === "og" && (
+        <div className="space-y-4">
+          <div className="p-4 mb-2" style={{ background: "rgba(13,74,114,0.12)", border: "1px solid rgba(13,74,114,0.25)", borderRadius: "4px" }}>
+            <h3 className="font-body font-semibold text-white text-sm mb-1">Snippet al compartir el link</h3>
+            <p className="font-body text-xs text-white/45">
+              Esto controla qué título, descripción e imagen aparecen cuando alguien comparte el link por WhatsApp, LinkedIn o Twitter.
+            </p>
+          </div>
+          {OG_KEYS.map(key => {
+            const item = config.find(c => c.key === key);
+            if (!item) return null;
+            return renderField(item, false);
+          })}
+          {/* Preview */}
+          {(() => {
+            const title = config.find(c => c.key === "og_title")?.value || "";
+            const desc = config.find(c => c.key === "og_description")?.value || "";
+            const img = config.find(c => c.key === "og_image_url")?.value || "";
+            if (!title && !desc) return null;
+            return (
+              <div>
+                <p className="font-body text-xs text-white/30 uppercase tracking-widest mb-3">Preview del snippet</p>
+                <div style={{ background: "#F4F8FC", borderRadius: "8px", overflow: "hidden", maxWidth: "400px" }}>
+                  {img && <div style={{ background: "#E8EFF6", height: "160px", overflow: "hidden" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </div>}
+                  <div className="p-3">
+                    <p className="font-body text-xs text-[#9DAEBF] mb-1">saneduardodesign.com.ar</p>
+                    <p className="font-body text-sm font-semibold text-[#0D2A3D] leading-snug">{title}</p>
+                    <p className="font-body text-xs text-[#5A6A7E] mt-1 line-clamp-2">{desc}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 

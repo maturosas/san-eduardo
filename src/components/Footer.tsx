@@ -27,13 +27,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Brand */}
           <div>
-            <div className="mb-6">
+            <div className="mb-6 inline-block" style={{ background: "#FFFFFF", padding: "6px 12px", borderRadius: "4px" }}>
               <Image
-                src="/images/logo-white.png"
+                src="/images/logo-color.jpg"
                 alt="San Eduardo Design — Corralón materiales construcción desde 1964"
                 width={160}
                 height={54}
-                className="h-12 w-auto"
+                className="h-10 w-auto"
               />
             </div>
             <p className="font-body text-white/40 text-sm leading-relaxed mb-6" style={{ fontWeight: 300 }}>
@@ -99,7 +99,19 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 pt-8 border-t border-white/08 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-14 pt-8 border-t border-white/08">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4">
+            {[
+              ["/politica-de-privacidad", "Política de privacidad"],
+              ["/politica-de-devoluciones", "Política de devoluciones"],
+              ["/faq", "Preguntas frecuentes"],
+            ].map(([href, label]) => (
+              <a key={href} href={href} className="font-body text-xs text-white/25 hover:text-white/50 transition-colors">
+                {label}
+              </a>
+            ))}
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="font-body text-xs text-white/20">
             © {new Date().getFullYear()} San Eduardo Design. Todos los derechos reservados.
           </p>
@@ -109,6 +121,7 @@ export default function Footer() {
               Tododeia
             </a>
           </p>
+          </div>
         </div>
       </div>
     </footer>
