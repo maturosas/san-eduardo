@@ -4,74 +4,126 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
 import Link from "next/link";
+import { Calendar, Clock, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Blog | San Eduardo Design — Construcción y materiales GBA Sur",
-  description: "Artículos sobre materiales de construcción, tendencias, consejos de obra y oportunidades inmobiliarias en el GBA Sur.",
+  description: "Artículos sobre materiales de construcción, tendencias, consejos de obra y oportunidades en el GBA Sur.",
 };
 
 export const revalidate = 60;
 
+const CATEGORY_COLORS: Record<string, string> = {
+  "Materiales": "#0D4A72",
+  "Construcción": "#C41E2A",
+  "Oportunidades inmobiliarias": "#10B981",
+  "GBA Sur": "#7C3AED",
+  "Consejos de obra": "#D97706",
+  "General": "#5A6A7E",
+};
+
 export default async function BlogPage() {
   const db = serverClient();
-  const { data } = await db.from("blog_posts").select("*").eq("published", true).order("published_at", { ascending: false });
-  const posts = (data as BlogPost[]) || [];
+  const { data } = await db
+    .from("blog_posts")
+    .select("*")
+    .eq("published", true)
+    .order("published_at", { ascending: false });
 
-  const categorias = [...new Set(posts.map(p => p.category))];
-  const fmtDate = (iso: string) => new Date(iso).toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
+  const posts = (data as BlogPost[]) || [];
+  const featured = posts[0];
+  const rest = posts.slice(1);
+
+  const fmtDate = (iso: string) =>
+    new Date(iso).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" });
   const readTime = (content: string) => Math.max(2, Math.ceil(content.split(" ").length / 200));
 
   return (
     <>
       <Navbar />
       <main>
-        {/* Hero */}
-        <section className="pt-28 pb-16" style={{ background: "#0D4A72" }}>
+        {/* Header */}
+        <section className="pt-28 pb-14" style={{ background: "#0D4A72" }}>
           <div className="se-container">
             <div className="flex items-center gap-3 mb-4">
               <div className="h-0.5 w-8" style={{ background: "#FFD700" }} />
               <span className="font-body text-xs font-bold tracking-[0.22em] uppercase" style={{ color: "#FFD700" }}>Blog</span>
             </div>
-            <h1 className="font-display text-white leading-none mb-4" style={{ fontSize: "clamp(2.4rem,6vw,4rem)", letterSpacing: "0.03em" }}>
-              MATERIALES, OBRA
-              <br />Y OPORTUNIDADES.
+            <h1 className="font-display text-white leading-none mb-3" style={{ fontSize: "clamp(2.2rem,6vw,4rem)", letterSpacing: "0.03em" }}>
+              MATERIALES, OBRA<br />Y OPORTUNIDADES.
             </h1>
-            <p className="font-body text-white/55 text-lg max-w-xl" style={{ fontWeight: 300 }}>
-              Artículos sobre construcción, materiales, tendencias y oportunidades inmobiliarias en el GBA Sur.
+            <p className="font-body text-white/55 text-base max-w-xl" style={{ fontWeight: 300 }}>
+              Guías prácticas sobre construcción, materiales y tendencias para el GBA Sur. Escrito por quienes atienden la obra todos los días.
             </p>
           </div>
         </section>
 
-        <section className="py-16" style={{ background: "#F4F8FC" }}>
+        <section className="py-14" style={{ background: "#F4F8FC" }}>
           <div className="se-container">
             {posts.length === 0 ? (
               <div className="text-center py-20">
                 <p className="font-display text-4xl mb-3" style={{ color: "#0D4A72", letterSpacing: "0.05em" }}>PRÓXIMAMENTE</p>
-                <p className="font-body text-[#5A6A7E]">Estamos preparando los primeros artículos. Volvé pronto.</p>
-                <Link href="/" className="inline-block mt-6 font-body text-sm font-semibold text-[#C41E2A]">← Volver al inicio</Link>
+                <p className="font-body text-[#5A6A7E]">Estamos preparando los primeros artículos.</p>
               </div>
             ) : (
               <>
-                {/* Featured */}
-                {posts[0] && (
-                  <Link href={`/blog/${posts[0].slug}`} className="group block mb-12">
-                    <div className="grid md:grid-cols-2 gap-0 overflow-hidden" style={{ borderRadius: "6px", boxShadow: "0 8px 32px rgba(13,74,114,0.12)" }}>
-                      <div className="aspect-video md:aspect-auto md:min-h-64 overflow-hidden" style={{ background: "#0D4A72" }}>
-                        {posts[0].image_url
-                          ? <img src={posts[0].image_url} alt={posts[0].title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                          : <div className="w-full h-full flex items-center justify-center"><span className="font-display text-5xl text-white/20" style={{ letterSpacing: "0.1em" }}>SE</span></div>
-                        }
+                {/* Featured article */}
+                {featured && (
+                  <Link href={`/blog/${featured.slug}`} className="group block mb-12">
+                    <div
+                      className="grid md:grid-cols-5 overflow-hidden transition-all hover:shadow-lg"
+                      style={{ borderRadius: "6px", border: "1px solid rgba(13,74,114,0.1)", boxShadow: "0 2px 12px rgba(13,74,114,0.08)" }}
+                    >
+                      {/* Image */}
+                      <div className="md:col-span-2 overflow-hidden" style={{ minHeight: "240px", background: "#0D4A72", position: "relative" }}>
+                        {featured.image_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={featured.image_url} alt={featured.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ position: "absolute", inset: 0 }} />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span
+                              className="font-display text-white/10"
+                              style={{ fontSize: "6rem", letterSpacing: "0.1em" }}
+                            >SE</span>
+                          </div>
+                        )}
+                        {/* Category overlay */}
+                        <div className="absolute top-4 left-4">
+                          <span
+                            className="font-body text-xs font-bold uppercase tracking-widest px-2.5 py-1"
+                            style={{ background: CATEGORY_COLORS[featured.category] || "#0D4A72", color: "#FFF", borderRadius: "3px" }}
+                          >
+                            {featured.category} · Destacado
+                          </span>
+                        </div>
                       </div>
-                      <div className="p-8" style={{ background: "#FFFFFF" }}>
-                        <span className="font-body text-xs font-bold uppercase tracking-widest" style={{ color: "#C41E2A" }}>{posts[0].category} · Destacado</span>
-                        <h2 className="font-display mt-3 mb-3 group-hover:text-[#C41E2A] transition-colors" style={{ fontSize: "1.8rem", color: "#0D4A72", letterSpacing: "0.03em", lineHeight: 1.2 }}>
-                          {posts[0].title}
-                        </h2>
-                        <p className="font-body text-[#5A6A7E] text-sm leading-relaxed mb-5" style={{ fontWeight: 300 }}>{posts[0].excerpt}</p>
-                        <div className="flex items-center justify-between">
-                          <span className="font-body text-xs text-[#5A6A7E]">{fmtDate(posts[0].published_at || posts[0].created_at)}</span>
-                          <span className="font-body text-xs font-semibold" style={{ color: "#C41E2A" }}>{readTime(posts[0].content || "")} min →</span>
+
+                      {/* Content */}
+                      <div className="md:col-span-3 p-7 flex flex-col justify-between" style={{ background: "#FFFFFF" }}>
+                        <div>
+                          <h2
+                            className="font-display mb-3 group-hover:text-[#C41E2A] transition-colors leading-tight"
+                            style={{ fontSize: "clamp(1.4rem,3vw,1.9rem)", color: "#0D4A72", letterSpacing: "0.02em" }}
+                          >
+                            {featured.title}
+                          </h2>
+                          <p className="font-body text-[#5A6A7E] text-sm leading-relaxed line-clamp-3" style={{ fontWeight: 300 }}>
+                            {featured.excerpt}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between mt-5 pt-5 border-t" style={{ borderColor: "rgba(13,74,114,0.08)" }}>
+                          <div className="flex items-center gap-3 text-[#9DAEBF]">
+                            <span className="flex items-center gap-1.5 font-body text-xs">
+                              <Calendar size={12} />{fmtDate(featured.published_at || featured.created_at)}
+                            </span>
+                            <span className="flex items-center gap-1.5 font-body text-xs">
+                              <Clock size={12} />{readTime(featured.content || "")} min
+                            </span>
+                          </div>
+                          <span className="flex items-center gap-1.5 font-body text-sm font-semibold group-hover:gap-3 transition-all" style={{ color: "#C41E2A" }}>
+                            Leer artículo <ArrowRight size={14} />
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -79,30 +131,59 @@ export default async function BlogPage() {
                 )}
 
                 {/* Grid */}
-                {posts.length > 1 && (
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {posts.slice(1).map(post => (
-                      <Link key={post.id} href={`/blog/${post.slug}`} className="group block overflow-hidden" style={{ background: "#FFFFFF", borderRadius: "6px", border: "1px solid rgba(13,74,114,0.1)", boxShadow: "0 2px 8px rgba(13,74,114,0.06)" }}>
-                        <div className="aspect-video overflow-hidden" style={{ background: "#0D4A72" }}>
-                          {post.image_url
-                            ? <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            : <div className="w-full h-full flex items-center justify-center"><span className="font-display text-3xl text-white/20">SE</span></div>
-                          }
-                        </div>
-                        <div className="p-5">
-                          <span className="font-body text-xs font-bold uppercase tracking-widest" style={{ color: "#C41E2A" }}>{post.category}</span>
-                          <h3 className="font-display mt-2 mb-2 group-hover:text-[#C41E2A] transition-colors line-clamp-2" style={{ fontSize: "1.2rem", color: "#0D4A72", letterSpacing: "0.03em", lineHeight: 1.3 }}>
-                            {post.title}
-                          </h3>
-                          <p className="font-body text-sm text-[#5A6A7E] line-clamp-2 mb-4" style={{ fontWeight: 300 }}>{post.excerpt}</p>
-                          <div className="flex items-center justify-between">
-                            <span className="font-body text-xs text-[#9DAEBF]">{fmtDate(post.published_at || post.created_at)}</span>
-                            <span className="font-body text-xs font-semibold" style={{ color: "#C41E2A" }}>{readTime(post.content || "")} min →</span>
+                {rest.length > 0 && (
+                  <>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="h-px flex-1" style={{ background: "rgba(13,74,114,0.1)" }} />
+                      <span className="font-body text-xs text-[#9DAEBF] uppercase tracking-widest">Todos los artículos</span>
+                      <div className="h-px flex-1" style={{ background: "rgba(13,74,114,0.1)" }} />
+                    </div>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {rest.map(post => (
+                        <Link key={post.id} href={`/blog/${post.slug}`} className="group flex flex-col overflow-hidden transition-all hover:-translate-y-1 duration-300"
+                          style={{ background: "#FFFFFF", borderRadius: "6px", border: "1px solid rgba(13,74,114,0.1)", boxShadow: "0 2px 8px rgba(13,74,114,0.06)" }}>
+                          {/* Image */}
+                          <div className="overflow-hidden" style={{ aspectRatio: "16/9", background: "#E8EFF6", position: "relative" }}>
+                            {post.image_url ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ position: "absolute", inset: 0 }} />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="font-display text-[#0D4A72]/10" style={{ fontSize: "3rem" }}>SE</span>
+                              </div>
+                            )}
+                            <div className="absolute top-3 left-3">
+                              <span
+                                className="font-body text-xs font-bold uppercase tracking-widest px-2 py-0.5"
+                                style={{ background: CATEGORY_COLORS[post.category] || "#0D4A72", color: "#FFF", borderRadius: "3px" }}
+                              >
+                                {post.category}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+
+                          {/* Content */}
+                          <div className="p-5 flex flex-col flex-1">
+                            <h3
+                              className="font-display mb-2 group-hover:text-[#C41E2A] transition-colors leading-snug flex-1"
+                              style={{ fontSize: "1.1rem", color: "#0D4A72", letterSpacing: "0.02em" }}
+                            >
+                              {post.title}
+                            </h3>
+                            {post.excerpt && (
+                              <p className="font-body text-xs text-[#5A6A7E] line-clamp-2 mb-4" style={{ fontWeight: 300 }}>
+                                {post.excerpt}
+                              </p>
+                            )}
+                            <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: "rgba(13,74,114,0.08)" }}>
+                              <span className="font-body text-xs text-[#9DAEBF]">{fmtDate(post.published_at || post.created_at)}</span>
+                              <span className="font-body text-xs font-semibold" style={{ color: "#C41E2A" }}>{readTime(post.content || "")} min →</span>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </>
                 )}
               </>
             )}

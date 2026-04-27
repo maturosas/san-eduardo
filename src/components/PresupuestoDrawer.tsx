@@ -10,7 +10,7 @@ function formatPrecio(p: number) {
 }
 
 export default function PresupuestoDrawer() {
-  const { items, removeItem, updateCantidad, clear, isOpen, setIsOpen, total } = usePresupuesto();
+  const { items, removeItem, updateCantidad, clear, isOpen, setIsOpen, notification, clearNotification, total } = usePresupuesto();
   const [form, setForm] = useState({ nombre: "", telefono: "", email: "", mensaje: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
 
@@ -50,6 +50,73 @@ export default function PresupuestoDrawer() {
 
   return (
     <>
+      <style>{`
+        .se-presupuesto-panel {
+          position: fixed;
+          right: 16px;
+          top: 80px;
+          bottom: 16px;
+          z-index: 50;
+          width: min(420px, calc(100vw - 32px));
+          border-radius: 8px;
+        }
+        @media (max-width: 640px) {
+          .se-presupuesto-panel {
+            left: 12px;
+            right: 12px;
+            top: auto;
+            bottom: 84px;
+            width: auto;
+            max-height: 72dvh;
+          }
+        }
+      `}</style>
+
+      {/* Add notification */}
+      <AnimatePresence>
+        {notification && !isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.98 }}
+            className="fixed left-4 right-4 sm:left-auto sm:right-6 z-50 p-4"
+            style={{
+              bottom: "96px",
+              maxWidth: "360px",
+              marginLeft: "auto",
+              background: "#FFFFFF",
+              border: "1px solid rgba(13,74,114,0.14)",
+              borderRadius: "8px",
+              boxShadow: "0 12px 32px rgba(13,74,114,0.18)",
+            }}
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 flex items-center justify-center flex-shrink-0" style={{ background: "#0D4A72", borderRadius: "50%" }}>
+                <ClipboardList size={16} className="text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-body text-sm font-semibold leading-tight" style={{ color: "#0D2A3D" }}>
+                  Agregado al presupuesto
+                </p>
+                <p className="font-body text-xs truncate mt-0.5" style={{ color: "#5A6A7E" }}>
+                  {notification}
+                </p>
+                <button
+                  onClick={() => { clearNotification(); setIsOpen(true); }}
+                  className="font-body text-xs font-bold mt-2"
+                  style={{ color: "#C41E2A" }}
+                >
+                  Ver presupuesto
+                </button>
+              </div>
+              <button onClick={clearNotification} className="text-[#9DAEBF] hover:text-[#0D4A72] transition-colors">
+                <X size={14} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Floating button */}
       <AnimatePresence>
         {count > 0 && (
@@ -77,33 +144,19 @@ export default function PresupuestoDrawer() {
         )}
       </AnimatePresence>
 
-      {/* Backdrop */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50"
-            style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
-            onClick={() => setIsOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
       {/* Drawer */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ x: "100%" }}
+            initial={{ x: 32, opacity: 0 }}
             animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            exit={{ x: 32, opacity: 0 }}
             transition={{ type: "spring", damping: 28, stiffness: 280 }}
-            className="fixed right-0 top-0 bottom-0 z-50 flex flex-col overflow-hidden"
+            className="se-presupuesto-panel flex flex-col overflow-hidden"
             style={{
-              width: "min(480px, 100vw)",
               background: "#FFFFFF",
-              boxShadow: "-8px 0 40px rgba(0,0,0,0.15)",
+              boxShadow: "0 16px 44px rgba(0,0,0,0.18)",
+              border: "1px solid rgba(13,74,114,0.14)",
             }}
           >
             {/* Header */}

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Rubro, RubroItem } from "@/types";
 import { Plus, Pencil, Trash2, X, Check, ChevronRight, Eye, EyeOff } from "lucide-react";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 async function adminPost(action: string, payload: object) {
   const res = await fetch("/api/admin", {
@@ -10,7 +11,11 @@ async function adminPost(action: string, payload: object) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token: process.env.NEXT_PUBLIC_ADMIN_PASS || "saneduardo2024", action, ...payload }),
   });
-  return res.json();
+  const json = await res.json();
+  if (!res.ok || json.error) {
+    throw new Error(json.error || "Error al guardar");
+  }
+  return json;
 }
 
 const inputCls = "w-full font-body text-sm bg-white/5 border border-white/10 text-white placeholder-white/25 px-3 py-2.5 focus:outline-none focus:border-[#0D4A72] transition-colors rounded-sm";
@@ -52,23 +57,28 @@ export default function RubrosTab() {
   const saveRubro = async () => {
     if (!editing) return;
     setSaving(true);
-    await adminPost(editing._new ? "upsert_rubro" : "upsert_rubro", {
-      id: editing._new ? undefined : editing.id,
-      data: {
-        name: editing.name,
-        slug: editing.slug || toSlug(editing.name || ""),
-        description: editing.description,
-        long_description: editing.long_description,
-        icon: editing.icon,
-        whatsapp_text: editing.whatsapp_text,
-        image_url: editing.image_url,
-        active: editing.active ?? true,
-        orden: editing.orden ?? 99,
-      },
-    });
-    setEditing(null);
-    await load();
-    setSaving(false);
+    try {
+      await adminPost(editing._new ? "upsert_rubro" : "upsert_rubro", {
+        id: editing._new ? undefined : editing.id,
+        data: {
+          name: editing.name,
+          slug: editing.slug || toSlug(editing.name || ""),
+          description: editing.description,
+          long_description: editing.long_description,
+          icon: editing.icon,
+          whatsapp_text: editing.whatsapp_text,
+          image_url: editing.image_url,
+          active: editing.active ?? true,
+          orden: editing.orden ?? 99,
+        },
+      });
+      setEditing(null);
+      await load();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Error al guardar rubro");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const toggleActive = async (r: Rubro) => {
@@ -79,24 +89,33 @@ export default function RubrosTab() {
   const saveItem = async () => {
     if (!editingItem || !selectedRubro) return;
     setSaving(true);
-    await adminPost("upsert_rubro_item", {
-      id: editingItem._new ? undefined : editingItem.id,
+    try {
+      await adminPost("upsert_rubro_item", {
+        id: editingItem._new ? undefined : editingItem.id,
       data: {
         rubro_id: selectedRubro,
         name: editingItem.name,
+        slug: editingItem.slug || toSlug(editingItem.name || ""),
         description: editingItem.description || "",
+        long_description: editingItem.long_description || "",
+        seo_title: editingItem.seo_title || "",
+        meta_description: editingItem.meta_description || "",
         price: editingItem.price ?? null,
         promo_price: editingItem.promo_price ?? null,
         image_url: editingItem.image_url || null,
-        badge: editingItem.badge || "En construcción",
-        active: editingItem.active ?? true,
-        orden: editingItem.orden ?? 99,
-      },
-    });
-    setEditingItem(null);
-    const { data } = await supabase.from("rubro_items").select("*").eq("rubro_id", selectedRubro).order("orden");
-    setItems(prev => ({ ...prev, [selectedRubro]: (data as RubroItem[]) || [] }));
-    setSaving(false);
+          badge: editingItem.badge || "En construcción",
+          active: editingItem.active ?? true,
+          orden: editingItem.orden ?? 99,
+        },
+      });
+      setEditingItem(null);
+      const { data } = await supabase.from("rubro_items").select("*").eq("rubro_id", selectedRubro).order("orden");
+      setItems(prev => ({ ...prev, [selectedRubro]: (data as RubroItem[]) || [] }));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Error al guardar producto");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const deleteItem = async (id: string, rubroId: string) => {
@@ -265,8 +284,11 @@ export default function RubrosTab() {
                 <input value={editing.whatsapp_text || ""} onChange={e => setEditing(p => ({ ...p!, whatsapp_text: e.target.value }))} className={inputCls} />
               </div>
               <div className="col-span-2">
-                <label className="font-body text-xs text-white/40 uppercase tracking-widest mb-1 block">URL de imagen (portada)</label>
-                <input value={editing.image_url || ""} onChange={e => setEditing(p => ({ ...p!, image_url: e.target.value }))} placeholder="https://..." className={inputCls} />
+                <ImageUploader
+                  label="Imagen de portada"
+                  value={editing.image_url || ""}
+                  onChange={url => setEditing(p => ({ ...p!, image_url: url }))}
+                />
               </div>
             </div>
             <div className="flex gap-3 justify-end pt-2">
@@ -304,12 +326,27 @@ function ItemForm({
     <div className="space-y-2 p-3" style={{ background: "rgba(13,74,114,0.15)", border: "1px solid rgba(13,74,114,0.3)", borderRadius: "4px" }}>
       {/* Row 1: nombre + badge */}
       <div className="grid grid-cols-2 gap-2">
-        <input
-          placeholder="Nombre del producto *"
-          value={item.name || ""}
-          onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, name: v } : p); }}
-          className={inputCls}
-        />
+        <div>
+          <input
+            placeholder="Nombre del producto *"
+            value={item.name || ""}
+            onChange={e => {
+              const v = e.target.value;
+              onChange(p => p ? { ...p, name: v, slug: p.slug || toSlug(v) } : p);
+            }}
+            className={inputCls}
+          />
+          <label className="font-body text-xs text-white/35 mt-2 mb-1 block">URL del producto</label>
+          <input
+            placeholder="ej: porcelanato-simil-madera"
+            value={item.slug || ""}
+            onChange={e => { const v = toSlug(e.target.value); onChange(p => p ? { ...p, slug: v } : p); }}
+            className={inputCls}
+          />
+          {item.slug && (
+            <p className="font-body text-xs text-white/25 mt-1">/productos/{item.slug}</p>
+          )}
+        </div>
         <select
           value={item.badge || "En construcción"}
           onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, badge: v } : p); }}
@@ -321,13 +358,46 @@ function ItemForm({
 
       {/* Row 2: descripción */}
       <textarea
-        placeholder="Descripción (opcional)"
+        placeholder="Descripción corta para cards y resumen SEO"
         value={item.description || ""}
         onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, description: v } : p); }}
         className={inputCls}
         rows={2}
         style={{ resize: "none" }}
       />
+
+      <textarea
+        placeholder="Descripción larga para la página del producto"
+        value={item.long_description || ""}
+        onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, long_description: v } : p); }}
+        className={inputCls}
+        rows={4}
+        style={{ resize: "vertical" }}
+      />
+
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="font-body text-xs text-white/35 mb-1 block">Título SEO</label>
+          <input
+            placeholder="Ej: Porcellanato en Temperley | San Eduardo"
+            value={item.seo_title || ""}
+            onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, seo_title: v } : p); }}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="font-body text-xs text-white/35 mb-1 block">Meta descripción</label>
+          <textarea
+            placeholder="Texto para Google, ideal 140-160 caracteres"
+            value={item.meta_description || ""}
+            onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, meta_description: v } : p); }}
+            className={inputCls}
+            rows={2}
+            style={{ resize: "none" }}
+          />
+          <p className="font-body text-xs text-white/25 mt-1">{(item.meta_description || "").length}/160</p>
+        </div>
+      </div>
 
       {/* Row 3: precios */}
       <div className="grid grid-cols-2 gap-2">
@@ -354,15 +424,11 @@ function ItemForm({
       </div>
 
       {/* Row 4: imagen */}
-      <input
-        placeholder="URL de imagen (https://...)"
+      <ImageUploader
         value={item.image_url || ""}
-        onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, image_url: v } : p); }}
-        className={inputCls}
+        onChange={url => onChange(p => p ? { ...p, image_url: url } : p)}
+        label="Imagen del producto"
       />
-      {item.image_url && (
-        <img src={item.image_url} alt="preview" className="h-20 w-auto object-cover" style={{ borderRadius: "3px" }} />
-      )}
 
       {/* Actions */}
       <div className="flex gap-2 justify-end pt-1">

@@ -39,7 +39,7 @@ export default function Hero() {
     <section
       ref={ref}
       className="relative flex items-center overflow-hidden"
-      style={{ height: "clamp(520px, 85vh, 780px)" }}
+      style={{ minHeight: "clamp(680px, 92vh, 860px)" }}
     >
       {/* Background */}
       <AnimatePresence mode="wait">
@@ -72,7 +72,7 @@ export default function Hero() {
       />
 
       {/* Content */}
-      <div className="relative z-20 se-container w-full" style={{ paddingTop: "80px" }}>
+      <div className="relative z-20 se-container w-full" style={{ paddingTop: "96px", paddingBottom: "150px" }}>
         <div className="max-w-2xl">
           {/* Eyebrow */}
           <motion.div
@@ -125,7 +125,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
-            className="flex flex-wrap gap-3 mb-8"
+            className="flex flex-wrap gap-3 mb-10"
           >
             <a
               href="#contacto"
@@ -179,7 +179,7 @@ export default function Hero() {
         {STATS.map((s, i) => (
           <div
             key={s.label}
-            className="text-center py-3 sm:py-4 px-3"
+            className="text-center py-4 sm:py-5 px-3"
             style={{
               background: i % 2 === 0 ? "rgba(13,74,114,0.88)" : "rgba(10,60,90,0.88)",
               backdropFilter: "blur(8px)",

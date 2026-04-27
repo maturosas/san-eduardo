@@ -23,8 +23,8 @@ const IconYoutube = () => (
 export default function Footer() {
   return (
     <footer style={{ background: "#0A3055", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-      <div className="se-container py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="se-container pt-20 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-14 md:gap-16">
           {/* Brand */}
           <div>
             <div className="mb-6 inline-block" style={{ background: "#FFFFFF", padding: "6px 12px", borderRadius: "4px" }}>
@@ -126,8 +126,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 pt-8 border-t border-white/08">
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4">
+        <div className="mt-16 pt-10 border-t border-white/08">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 mb-6">
             {[
               ["/politica-de-privacidad", "Política de privacidad"],
               ["/politica-de-devoluciones", "Política de devoluciones"],
@@ -139,15 +139,15 @@ export default function Footer() {
             ))}
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="font-body text-xs text-white/20">
-            © {new Date().getFullYear()} San Eduardo Design. Todos los derechos reservados.
-          </p>
-          <p className="font-body text-xs text-white/15 text-center">
-            Diseñado por{" "}
-            <a href="https://tododeia.com" target="_blank" rel="noopener noreferrer" className="hover:text-white/40 transition-colors">
-              Tododeia
-            </a>
-          </p>
+            <p className="font-body text-xs text-white/20">
+              © {new Date().getFullYear()} San Eduardo Design. Todos los derechos reservados.
+            </p>
+            <p className="font-body text-xs text-white/15 text-center">
+              by -{" "}
+              <a href="https://agencia-plan.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white/40 transition-colors">
+                agenciaboutique
+              </a>
+            </p>
           </div>
         </div>
       </div>

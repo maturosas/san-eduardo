@@ -16,7 +16,11 @@ export type RubroItem = {
   id: string;
   rubro_id: string;
   name: string;
+  slug: string | null;
   description: string;
+  long_description: string | null;
+  seo_title: string | null;
+  meta_description: string | null;
   price: number | null;
   promo_price: number | null;
   image_url: string | null;

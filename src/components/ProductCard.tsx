@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MessageCircle, ClipboardList, Check } from "lucide-react";
 import { usePresupuesto, PresupuestoItem } from "@/context/PresupuestoContext";
 import { getWhatsAppUrlByRubro } from "@/lib/whatsapp";
+import Link from "next/link";
 
 export type ProductCardData = {
   id: string;
@@ -15,6 +16,7 @@ export type ProductCardData = {
   badge: string;
   rubro: string;
   rubroSlug: string;
+  slug: string;
 };
 
 function getBadgeColor(badge: string): string {
@@ -54,6 +56,7 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
   };
 
   const waUrl = getWhatsAppUrlByRubro(`${product.nombre} (${product.rubro})`);
+  const productUrl = `/productos/${product.slug}`;
 
   return (
     <div
@@ -66,7 +69,9 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
       }}
     >
       {/* Image */}
-      <div
+      <Link
+        href={productUrl}
+        aria-label={`Ver producto ${product.nombre}`}
         className="relative overflow-hidden"
         style={{ aspectRatio: "4/3", background: "#E8EFF6" }}
       >
@@ -94,16 +99,17 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
         >
           {product.badge || "En construcción"}
         </div>
-      </div>
+      </Link>
 
       {/* Body */}
       <div className="flex flex-col flex-1 p-4">
-        <h3
-          className="font-body font-semibold mb-1 leading-snug"
+        <Link
+          href={productUrl}
+          className="font-body font-semibold mb-1 leading-snug hover:text-[#C41E2A] transition-colors"
           style={{ fontSize: "15px", color: "#0D2A3D" }}
         >
           {product.nombre}
-        </h3>
+        </Link>
         {product.descripcion && (
           <p
             className="font-body text-xs leading-relaxed mb-3 flex-1"
@@ -139,6 +145,13 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
 
         {/* CTAs */}
         <div className="flex flex-col gap-2">
+          <Link
+            href={productUrl}
+            className="flex items-center justify-center gap-2 w-full py-2.5 font-body font-semibold text-sm transition-all hover:opacity-90"
+            style={{ background: "#E8EFF6", color: "#0D4A72", borderRadius: "4px" }}
+          >
+            Ver detalle
+          </Link>
           <button
             onClick={handleAdd}
             className="flex items-center justify-center gap-2 w-full py-2.5 font-body font-semibold text-sm transition-all"

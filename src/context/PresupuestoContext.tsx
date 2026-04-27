@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 
 export type PresupuestoItem = {
   id: string;
@@ -21,6 +21,8 @@ type PresupuestoCtx = {
   clear: () => void;
   isOpen: boolean;
   setIsOpen: (v: boolean) => void;
+  notification: string | null;
+  clearNotification: () => void;
   total: number;
 };
 
@@ -31,7 +33,9 @@ const LS_KEY = "se_presupuesto";
 export function PresupuestoProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<PresupuestoItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const notificationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     try {
@@ -53,7 +57,9 @@ export function PresupuestoProvider({ children }: { children: React.ReactNode })
       }
       return [...prev, { ...item, cantidad: 1 }];
     });
-    setIsOpen(true);
+    setNotification(item.nombre);
+    if (notificationTimer.current) clearTimeout(notificationTimer.current);
+    notificationTimer.current = setTimeout(() => setNotification(null), 4200);
   }, []);
 
   const removeItem = useCallback((id: string) => {
@@ -71,13 +77,18 @@ export function PresupuestoProvider({ children }: { children: React.ReactNode })
     localStorage.removeItem(LS_KEY);
   }, []);
 
+  const clearNotification = useCallback(() => {
+    setNotification(null);
+    if (notificationTimer.current) clearTimeout(notificationTimer.current);
+  }, []);
+
   const total = items.reduce((acc, i) => {
     const precio = i.precioPromo ?? i.precio ?? 0;
     return acc + precio * i.cantidad;
   }, 0);
 
   return (
-    <Ctx.Provider value={{ items, addItem, removeItem, updateCantidad, clear, isOpen, setIsOpen, total }}>
+    <Ctx.Provider value={{ items, addItem, removeItem, updateCantidad, clear, isOpen, setIsOpen, notification, clearNotification, total }}>
       {children}
     </Ctx.Provider>
   );

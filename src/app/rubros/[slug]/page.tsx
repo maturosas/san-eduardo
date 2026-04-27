@@ -13,6 +13,10 @@ import type { Metadata } from "next";
 
 type Props = { params: Promise<{ slug: string }> };
 
+function toSlug(str: string) {
+  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const db = serverClient();
@@ -65,6 +69,7 @@ export default async function RubroPage({ params }: Props) {
     badge: (item.badge as string) || "En construcción",
     rubro: r.name,
     rubroSlug: r.slug,
+    slug: (item.slug as string) || toSlug(item.name as string),
   }));
 
   return (

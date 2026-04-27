@@ -7,9 +7,10 @@ const BASE = "https://saneduardodesign.com.ar";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const db = serverClient();
 
-  const [{ data: posts }, { data: rubros }] = await Promise.all([
+  const [{ data: posts }, { data: rubros }, { data: products }] = await Promise.all([
     db.from("blog_posts").select("slug,updated_at").eq("published", true),
     db.from("rubros").select("slug").eq("active", true),
+    db.from("rubro_items").select("slug").eq("active", true).not("slug", "is", null),
   ]);
 
   const static_pages: MetadataRoute.Sitemap = [
@@ -41,5 +42,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...static_pages, ...zona_pages, ...rubro_pages, ...blog_pages];
+  const product_pages: MetadataRoute.Sitemap = (products || []).map(p => ({
+    url: `${BASE}/productos/${p.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.75,
+  }));
+
+  return [...static_pages, ...zona_pages, ...rubro_pages, ...product_pages, ...blog_pages];
 }

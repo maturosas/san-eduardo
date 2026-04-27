@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { BlogPost } from "@/types";
 import { Plus, Pencil, Trash2, X, Eye, Globe, FileText } from "lucide-react";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 async function adminPost(action: string, payload: object) {
   const res = await fetch("/api/admin", {
@@ -115,10 +116,11 @@ export default function BlogTab() {
             <label className="font-body text-xs text-white/40 uppercase tracking-widest mb-1 block">Contenido completo</label>
             <textarea value={editing.content || ""} onChange={e => setEditing(p => ({ ...p!, content: e.target.value }))} className={inputCls} rows={14} style={{ resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} placeholder="Escribí el artículo acá. Usá saltos de línea para párrafos." />
           </div>
-          <div>
-            <label className="font-body text-xs text-white/40 uppercase tracking-widest mb-1 block">URL de imagen de portada</label>
-            <input value={editing.image_url || ""} onChange={e => setEditing(p => ({ ...p!, image_url: e.target.value }))} placeholder="https://..." className={inputCls} />
-          </div>
+          <ImageUploader
+            label="Imagen de portada"
+            value={editing.image_url || ""}
+            onChange={url => setEditing(p => ({ ...p!, image_url: url }))}
+          />
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 cursor-pointer">
               <div

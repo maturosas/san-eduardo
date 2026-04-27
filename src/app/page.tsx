@@ -1,7 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/sections/Hero";
 import Rubros from "@/components/sections/Rubros";
-import CTABanner from "@/components/sections/CTABanner";
 import Nosotros from "@/components/sections/Nosotros";
 import Testimonios from "@/components/sections/Testimonios";
 import Zonas from "@/components/sections/Zonas";
@@ -17,7 +16,6 @@ export default function Home() {
       <main>
         <Hero />
         <Rubros />
-        <CTABanner />
         <Nosotros />
         <Testimonios />
         <Zonas />

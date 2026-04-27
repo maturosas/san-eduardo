@@ -53,6 +53,20 @@ export default function Contacto() {
           </p>
         </div>
 
+        {/* Google Maps */}
+        <div className="mb-8 overflow-hidden" style={{ borderRadius: "6px", border: "1px solid rgba(13,74,114,0.1)" }}>
+          <iframe
+            src="https://maps.google.com/maps?q=Dr.+Carlos+Collivadino+57,+Temperley,+Buenos+Aires,+Argentina&output=embed&hl=es&z=15"
+            width="100%"
+            height="240"
+            style={{ border: 0, display: "block" }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="San Eduardo Design — Dr. Carlos Collivadino 57, Temperley"
+          />
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Info */}
           <div className="space-y-4">

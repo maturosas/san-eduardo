@@ -70,6 +70,20 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true });
       }
 
+      // ── TESTIMONIOS ─────────────────────────────────────
+      case "upsert_testimonio": {
+        const { error } = id
+          ? await db.from("testimonios").update(data).eq("id", id)
+          : await db.from("testimonios").insert(data);
+        if (error) throw error;
+        return NextResponse.json({ ok: true });
+      }
+      case "delete_testimonio": {
+        const { error } = await db.from("testimonios").delete().eq("id", id);
+        if (error) throw error;
+        return NextResponse.json({ ok: true });
+      }
+
       // ── CONSULTAS ────────────────────────────────────────
       case "update_consulta": {
         const { error } = await db.from("consultas").update(data).eq("id", id);
