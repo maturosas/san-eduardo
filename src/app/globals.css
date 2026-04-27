@@ -1,26 +1,122 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-display);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* San Eduardo Design — Industrial Refined */
+  --se-black: #111110;
+  --se-amber: #E07B10;
+  --se-amber-light: #F59332;
+  --se-cream: #F5F0E8;
+  --se-gray: #6B7280;
+  --se-gray-light: #E8E4DC;
+  --se-border: rgba(17,17,16,0.12);
+
+  --background: #F5F0E8;
+  --foreground: #111110;
+  --card: #FFFFFF;
+  --card-foreground: #111110;
+  --primary: #111110;
+  --primary-foreground: #F5F0E8;
+  --secondary: #E8E4DC;
+  --secondary-foreground: #111110;
+  --muted: #E8E4DC;
+  --muted-foreground: #6B7280;
+  --accent: #E07B10;
+  --accent-foreground: #FFFFFF;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: rgba(17,17,16,0.12);
+  --input: rgba(17,17,16,0.08);
+  --ring: #E07B10;
+  --radius: 0.25rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+  body {
+    background-color: var(--se-cream);
+    color: var(--se-black);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  html {
+    scroll-behavior: smooth;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Typography */
+.font-display { font-family: var(--font-display), 'Bebas Neue', 'Impact', sans-serif; }
+.font-body { font-family: var(--font-body), 'Barlow', system-ui, sans-serif; }
+
+/* Industrial texture overlay */
+.texture-overlay {
+  position: relative;
 }
+.texture-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23000' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Amber accent line */
+.accent-line::before {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 3px;
+  background: var(--se-amber);
+  margin-bottom: 16px;
+}
+
+/* Utility */
+.se-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+@media (min-width: 768px) {
+  .se-container { padding: 0 40px; }
+}
+@media (min-width: 1024px) {
+  .se-container { padding: 0 64px; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--se-cream); }
+::-webkit-scrollbar-thumb { background: var(--se-amber); border-radius: 3px; }
