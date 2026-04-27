@@ -65,7 +65,7 @@ export default function Footer() {
           <div>
             <div className="font-body text-xs text-white/30 uppercase tracking-widest mb-5">Navegación</div>
             <nav className="space-y-3">
-              {[["#rubros","Rubros"],["#marcas","Marcas"],["#nosotros","Nosotros"],["#zonas","Zona de entrega"],["#contacto","Contacto"]].map(([href, label]) => (
+              {[["/#rubros","Rubros"],["/#marcas","Marcas"],["/#nosotros","Nosotros"],["/#zonas","Zona de entrega"],["/#contacto","Contacto"],["blog","Blog"]].map(([href, label]) => (
                 <a key={href} href={href} className="block font-body text-sm text-white/45 hover:text-white transition-colors">
                   {label}
                 </a>
