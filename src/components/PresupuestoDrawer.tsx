@@ -56,7 +56,7 @@ export default function PresupuestoDrawer() {
           right: 16px;
           top: 80px;
           bottom: 16px;
-          z-index: 50;
+          z-index: 60;
           width: min(420px, calc(100vw - 32px));
           border-radius: 8px;
         }
@@ -81,6 +81,7 @@ export default function PresupuestoDrawer() {
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
             className="fixed left-4 right-4 sm:left-auto sm:right-6 z-50 p-4"
             style={{
+              zIndex: 70,
               bottom: "96px",
               maxWidth: "360px",
               marginLeft: "auto",
@@ -124,7 +125,7 @@ export default function PresupuestoDrawer() {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            onClick={() => setIsOpen(true)}
+            onClick={() => { clearNotification(); setIsOpen(true); }}
             className="fixed bottom-6 left-6 z-40 flex items-center gap-2 font-body font-bold text-sm text-white px-4 py-3 shadow-xl"
             style={{
               background: "#0D4A72",
@@ -149,7 +150,7 @@ export default function PresupuestoDrawer() {
         {isOpen && (
           <motion.div
             initial={{ x: 32, opacity: 0 }}
-            animate={{ x: 0 }}
+            animate={{ x: 0, opacity: 1 }}
             exit={{ x: 32, opacity: 0 }}
             transition={{ type: "spring", damping: 28, stiffness: 280 }}
             className="se-presupuesto-panel flex flex-col overflow-hidden"
