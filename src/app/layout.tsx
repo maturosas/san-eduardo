@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Barlow } from "next/font/google";
 import "./globals.css";
+import AnalyticsScripts from "@/components/AnalyticsScripts";
 
 const displayFont = Bebas_Neue({
   weight: "400",
@@ -102,6 +103,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <AnalyticsScripts />
       </head>
       <body className="antialiased">{children}</body>
     </html>

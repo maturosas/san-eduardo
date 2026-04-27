@@ -30,7 +30,7 @@ export default function Footer() {
             <div className="mb-6">
               <Image
                 src="/images/logo-white.png"
-                alt="San Eduardo Design"
+                alt="San Eduardo Design — Corralón materiales construcción desde 1964"
                 width={160}
                 height={54}
                 className="h-12 w-auto"

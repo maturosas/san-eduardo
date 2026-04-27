@@ -27,7 +27,7 @@ export default function Nosotros() {
             <div className="relative mb-10 overflow-hidden" style={{ borderRadius: "4px" }}>
               <Image
                 src="/images/construccion.jpg"
-                alt="Construcción con materiales San Eduardo"
+                alt="Obra de construcción con materiales de San Eduardo Design — Temperley GBA Sur"
                 width={600}
                 height={380}
                 className="w-full object-cover"

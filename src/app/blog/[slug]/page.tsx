@@ -4,6 +4,7 @@ import { BlogPost } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
+import BreadcrumbSchema from "@/components/BreadcrumbSchema";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock, MessageCircle } from "lucide-react";
 import type { Metadata } from "next";
@@ -41,6 +42,11 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <>
       <Navbar />
+      <BreadcrumbSchema items={[
+        { name: "Inicio", url: "/" },
+        { name: "Blog", url: "/blog" },
+        { name: post.title, url: `/blog/${post.slug}` },
+      ]} />
       <main>
         {/* Hero */}
         <section className="pt-24 pb-0" style={{ background: "#0D4A72" }}>

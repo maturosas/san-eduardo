@@ -48,7 +48,7 @@ export default function Navbar() {
             >
               <Image
                 src="/images/logo-color.jpg"
-                alt="San Eduardo Design"
+                alt="San Eduardo Design — Corralón materiales de construcción Temperley GBA Sur"
                 width={160}
                 height={52}
                 className="h-10 w-auto"

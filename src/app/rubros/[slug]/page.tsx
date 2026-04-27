@@ -4,8 +4,10 @@ import { Rubro, RubroItem } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
+import BreadcrumbSchema from "@/components/BreadcrumbSchema";
 import { ArrowLeft, MessageCircle, Phone, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { getWhatsAppUrlByRubro } from "@/lib/whatsapp";
 import type { Metadata } from "next";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -35,12 +37,18 @@ export default async function RubroPage({ params }: Props) {
   const { data: otrosRubros } = await db.from("rubros").select("name,slug,icon").eq("active", true).neq("slug", slug).order("orden").limit(4);
 
   const r = rubro as Rubro;
-  const waText = encodeURIComponent(r.whatsapp_text || `Hola, quiero cotizar ${r.name}.`);
-  const waLink = `https://api.whatsapp.com/send?phone=5491121613339&text=${waText}`;
+  const waLink = r.whatsapp_text
+    ? `https://wa.me/5491121613339?text=${encodeURIComponent(r.whatsapp_text)}`
+    : getWhatsAppUrlByRubro(r.name);
 
   return (
     <>
       <Navbar />
+      <BreadcrumbSchema items={[
+        { name: "Inicio", url: "/" },
+        { name: "Rubros", url: "/#rubros" },
+        { name: r.name, url: `/rubros/${r.slug}` },
+      ]} />
       <main>
         {/* Hero */}
         <section className="pt-28 pb-16" style={{ background: "#0D4A72" }}>
