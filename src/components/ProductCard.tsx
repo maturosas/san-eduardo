@@ -12,6 +12,7 @@ export type ProductCardData = {
   descripcion: string;
   precio: number | null;
   precioPromo: number | null;
+  stock: number | null;
   imagen: string | null;
   badge: string;
   rubro: string;
@@ -140,6 +141,11 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
             <span className="font-body text-sm font-medium" style={{ color: "#9DAEBF" }}>
               Consultá el precio
             </span>
+          )}
+          {product.stock !== null && product.stock !== undefined && (
+            <p className="font-body text-xs mt-1" style={{ color: product.stock > 0 ? "#10B981" : "#9DAEBF" }}>
+              {product.stock > 0 ? `Stock: ${product.stock}` : "Sin stock"}
+            </p>
           )}
         </div>
 

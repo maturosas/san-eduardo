@@ -93,6 +93,7 @@ export default async function RubroPage({ params, searchParams }: Props) {
     descripcion: (item.description as string) || "",
     precio: (item.price as number) ?? null,
     precioPromo: (item.promo_price as number) ?? null,
+    stock: (item.stock as number) ?? null,
     imagen: (item.image_url as string) ?? null,
     badge: (item.badge as string) || "En construcción",
     rubro: r.name,

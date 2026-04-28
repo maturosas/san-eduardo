@@ -42,6 +42,70 @@ export async function POST(req: NextRequest) {
         if (error) throw error;
         return NextResponse.json({ ok: true });
       }
+      case "bulk_upsert_rubro_items": {
+        const rows = Array.isArray(data?.rows) ? data.rows : [];
+        if (rows.length === 0) {
+          return NextResponse.json({ error: "No hay productos para importar" }, { status: 400 });
+        }
+        if (rows.length > 500) {
+          return NextResponse.json({ error: "Máximo 500 productos por importación" }, { status: 400 });
+        }
+
+        let inserted = 0;
+        let updated = 0;
+
+        for (const row of rows) {
+          const slug = String(row.slug || "").trim();
+          const rubroId = String(row.rubro_id || data.rubro_id || "").trim();
+          const payload = {
+            rubro_id: rubroId,
+            name: String(row.name || "").trim(),
+            slug,
+            description: String(row.description || ""),
+            long_description: String(row.long_description || ""),
+            seo_title: String(row.seo_title || ""),
+            meta_description: String(row.meta_description || ""),
+            price: row.price ?? null,
+            promo_price: row.promo_price ?? null,
+            stock: row.stock ?? null,
+            image_url: row.image_url || null,
+            badge: row.badge || "Disponible",
+            active: row.active ?? true,
+            orden: row.orden ?? 99,
+          };
+
+          if (!payload.rubro_id || !payload.name) continue;
+
+          if (row.id) {
+            const { error } = await db.from("rubro_items").update(payload).eq("id", row.id);
+            if (error) throw error;
+            updated += 1;
+            continue;
+          }
+
+          if (slug) {
+            const { data: existing, error: findError } = await db
+              .from("rubro_items")
+              .select("id")
+              .eq("rubro_id", payload.rubro_id)
+              .eq("slug", slug)
+              .maybeSingle();
+            if (findError) throw findError;
+            if (existing?.id) {
+              const { error } = await db.from("rubro_items").update(payload).eq("id", existing.id);
+              if (error) throw error;
+              updated += 1;
+              continue;
+            }
+          }
+
+          const { error } = await db.from("rubro_items").insert(payload);
+          if (error) throw error;
+          inserted += 1;
+        }
+
+        return NextResponse.json({ ok: true, inserted, updated });
+      }
 
       // ── BLOG ─────────────────────────────────────────────
       case "upsert_blog": {

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Rubro, RubroItem } from "@/types";
-import { Plus, Pencil, Trash2, X, Check, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, ChevronRight, Eye, EyeOff, Upload, Download } from "lucide-react";
 import ImageUploader from "@/components/admin/ImageUploader";
 
 async function adminPost(action: string, payload: object) {
@@ -23,6 +23,86 @@ const inputCls = "w-full font-body text-sm bg-white/5 border border-white/10 tex
 type EditingRubro = Partial<Rubro> & { _new?: boolean };
 type EditingItem = Partial<RubroItem> & { _new?: boolean };
 
+const PRODUCT_CSV_COLUMNS = [
+  "id",
+  "rubro_id",
+  "rubro_slug",
+  "rubro_name",
+  "name",
+  "slug",
+  "description",
+  "long_description",
+  "seo_title",
+  "meta_description",
+  "price",
+  "promo_price",
+  "stock",
+  "image_url",
+  "badge",
+  "active",
+  "orden",
+];
+
+function csvEscape(value: unknown) {
+  const str = value === null || value === undefined ? "" : String(value);
+  return /[",\n\r;]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+}
+
+function buildCsv(rows: Record<string, unknown>[]) {
+  return [
+    PRODUCT_CSV_COLUMNS.join(","),
+    ...rows.map(row => PRODUCT_CSV_COLUMNS.map(col => csvEscape(row[col])).join(",")),
+  ].join("\n");
+}
+
+function parseCsv(text: string) {
+  const rows: string[][] = [];
+  let current = "";
+  let row: string[] = [];
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+    if (char === '"' && quoted && next === '"') {
+      current += '"';
+      i++;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if ((char === "," || char === ";") && !quoted) {
+      row.push(current.trim());
+      current = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") i++;
+      row.push(current.trim());
+      if (row.some(Boolean)) rows.push(row);
+      row = [];
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  row.push(current.trim());
+  if (row.some(Boolean)) rows.push(row);
+  if (rows.length < 2) return [];
+
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1).map(values => Object.fromEntries(headers.map((h, i) => [h, values[i] ?? ""])));
+}
+
+function csvNumber(value: unknown) {
+  const str = String(value ?? "").trim().replace(/\./g, "").replace(",", ".");
+  if (!str) return null;
+  const num = Number(str);
+  return Number.isFinite(num) ? num : null;
+}
+
+function csvBoolean(value: unknown) {
+  const str = String(value ?? "").trim().toLowerCase();
+  if (!str) return true;
+  return ["1", "true", "si", "sí", "yes", "activo", "active"].includes(str);
+}
+
 export default function RubrosTab() {
   const [rubros, setRubros] = useState<Rubro[]>([]);
   const [items, setItems] = useState<Record<string, RubroItem[]>>({});
@@ -30,6 +110,7 @@ export default function RubrosTab() {
   const [editing, setEditing] = useState<EditingRubro | null>(null);
   const [editingItem, setEditingItem] = useState<EditingItem | null>(null);
   const [saving, setSaving] = useState(false);
+  const [importingRubro, setImportingRubro] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -102,6 +183,7 @@ export default function RubrosTab() {
         meta_description: editingItem.meta_description || "",
         price: editingItem.price ?? null,
         promo_price: editingItem.promo_price ?? null,
+        stock: editingItem.stock ?? null,
         image_url: editingItem.image_url || null,
           badge: editingItem.badge || "En construcción",
           active: editingItem.active ?? true,
@@ -125,6 +207,79 @@ export default function RubrosTab() {
       await loadItems(rubroId, true);
     } catch (err) {
       alert(err instanceof Error ? err.message : "No se pudo borrar el producto");
+    }
+  };
+
+  const exportItems = async (r: Rubro) => {
+    const { data, error } = await supabase.from("rubro_items").select("*").eq("rubro_id", r.id).order("orden");
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    const rows = ((data as RubroItem[]) || []).map(item => ({
+      id: item.id,
+      rubro_id: r.id,
+      rubro_slug: r.slug,
+      rubro_name: r.name,
+      name: item.name,
+      slug: item.slug || "",
+      description: item.description || "",
+      long_description: item.long_description || "",
+      seo_title: item.seo_title || "",
+      meta_description: item.meta_description || "",
+      price: item.price ?? "",
+      promo_price: item.promo_price ?? "",
+      stock: item.stock ?? "",
+      image_url: item.image_url || "",
+      badge: item.badge || "Disponible",
+      active: item.active ? "true" : "false",
+      orden: item.orden ?? 99,
+    }));
+
+    const csv = buildCsv(rows);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `productos-${r.slug}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importItems = async (file: File, r: Rubro) => {
+    setImportingRubro(r.id);
+    try {
+      const text = await file.text();
+      const rows = parseCsv(text).map(row => ({
+        id: String(row.id || "").trim() || undefined,
+        rubro_id: r.id,
+        name: String(row.name || "").trim(),
+        slug: toSlug(String(row.slug || row.name || "")),
+        description: String(row.description || ""),
+        long_description: String(row.long_description || ""),
+        seo_title: String(row.seo_title || ""),
+        meta_description: String(row.meta_description || ""),
+        price: csvNumber(row.price),
+        promo_price: csvNumber(row.promo_price),
+        stock: csvNumber(row.stock),
+        image_url: String(row.image_url || "").trim() || null,
+        badge: String(row.badge || "Disponible").trim(),
+        active: csvBoolean(row.active),
+        orden: csvNumber(row.orden) ?? 99,
+      })).filter(row => row.name);
+
+      if (rows.length === 0) {
+        alert("El CSV no tiene productos válidos. Revisá que tenga una columna name.");
+        return;
+      }
+
+      const result = await adminPost("bulk_upsert_rubro_items", { rubro_id: r.id, data: { rows } });
+      await loadItems(r.id, true);
+      alert(`Importación lista: ${result.inserted || 0} nuevos, ${result.updated || 0} actualizados.`);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "No se pudo importar el CSV");
+    } finally {
+      setImportingRubro(null);
     }
   };
 
@@ -175,11 +330,34 @@ export default function RubrosTab() {
             <div className="px-4 pb-4 border-t border-white/08">
               <div className="pt-3 flex items-center justify-between mb-3">
                 <span className="font-body text-xs text-white/40 uppercase tracking-widest">Ítems / Productos</span>
-                <button onClick={() => setEditingItem({ _new: true, rubro_id: r.id, active: true })}
-                  className="flex items-center gap-1 font-body text-xs font-semibold text-[#0D4A72] hover:text-white transition-colors">
-                  <Plus size={12} /> Agregar ítem
-                </button>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  <button onClick={() => exportItems(r)}
+                    className="flex items-center gap-1 font-body text-xs font-semibold text-white/45 hover:text-white transition-colors">
+                    <Download size={12} /> Exportar CSV
+                  </button>
+                  <label className="flex items-center gap-1 font-body text-xs font-semibold text-white/45 hover:text-white transition-colors cursor-pointer">
+                    <Upload size={12} /> {importingRubro === r.id ? "Importando..." : "Importar CSV"}
+                    <input
+                      type="file"
+                      accept=".csv,text/csv"
+                      className="hidden"
+                      disabled={importingRubro === r.id}
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) importItems(file, r);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                  <button onClick={() => setEditingItem({ _new: true, rubro_id: r.id, active: true })}
+                    className="flex items-center gap-1 font-body text-xs font-semibold text-[#0D4A72] hover:text-white transition-colors">
+                    <Plus size={12} /> Agregar ítem
+                  </button>
+                </div>
               </div>
+              <p className="font-body text-xs text-white/25 mb-3">
+                Podés exportar esta categoría, editar precios, promo, stock, imágenes y SEO en CSV, y volver a importarla. Si dejás el id, actualiza; si no hay id, usa el slug para actualizar o crea uno nuevo.
+              </p>
 
               {/* New/edit item form */}
               {editingItem && (editingItem._new || editingItem.rubro_id === r.id) && (
@@ -238,6 +416,9 @@ export default function RubrosTab() {
                               <span className="font-body text-xs font-semibold text-white/60">${item.price.toLocaleString("es-AR")}</span>
                             ) : (
                               <span className="font-body text-xs text-white/25">Sin precio</span>
+                            )}
+                            {item.stock !== null && item.stock !== undefined && (
+                              <span className="font-body text-xs text-white/35">Stock: {item.stock}</span>
                             )}
                             {item.description && <span className="font-body text-xs text-white/25 truncate">{item.description}</span>}
                           </div>
@@ -404,7 +585,7 @@ function ItemForm({
       </div>
 
       {/* Row 3: precios */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <div>
           <label className="font-body text-xs text-white/35 mb-1 block">Precio ($)</label>
           <input
@@ -422,6 +603,16 @@ function ItemForm({
             placeholder="Ej: 12000"
             value={item.promo_price ?? ""}
             onChange={e => { const v = e.target.value ? Number(e.target.value) : null; onChange(p => p ? { ...p, promo_price: v } : p); }}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="font-body text-xs text-white/35 mb-1 block">Stock</label>
+          <input
+            type="number"
+            placeholder="Ej: 25"
+            value={item.stock ?? ""}
+            onChange={e => { const v = e.target.value ? Number(e.target.value) : null; onChange(p => p ? { ...p, stock: v } : p); }}
             className={inputCls}
           />
         </div>

@@ -187,6 +187,11 @@ export default async function ProductPage({ params }: Props) {
                       </div>
                     </div>
                     <h2 className="font-display text-xl mb-2" style={{ color: "#0D4A72", letterSpacing: "0.04em" }}>PEDIR COTIZACIÓN</h2>
+                    {product.stock !== null && product.stock !== undefined && (
+                      <p className="font-body text-xs font-semibold mb-3" style={{ color: product.stock > 0 ? "#10B981" : "#9DAEBF" }}>
+                        {product.stock > 0 ? `Stock cargado: ${product.stock}` : "Sin stock cargado"}
+                      </p>
+                    )}
                     <p className="font-body text-sm text-[#5A6A7E] mb-4" style={{ fontWeight: 300 }}>
                       Agregalo a tu presupuesto o consultanos stock, precio actualizado y entrega.
                     </p>
