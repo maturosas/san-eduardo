@@ -53,7 +53,11 @@ export default function ConsultasTab() {
   const filtered = consultas.filter(c => {
     const matchEstado = filtro === "todas" || c.estado === filtro;
     const q = search.toLowerCase();
-    return matchEstado && (!q || c.nombre.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.zona?.toLowerCase().includes(q) ?? false));
+    return matchEstado && (!q
+      || c.nombre.toLowerCase().includes(q)
+      || (c.email?.toLowerCase().includes(q) ?? false)
+      || (c.telefono?.toLowerCase().includes(q) ?? false)
+      || (c.zona?.toLowerCase().includes(q) ?? false));
   });
 
   const counts = { nueva: consultas.filter(c => c.estado === "nueva").length, en_contacto: consultas.filter(c => c.estado === "en_contacto").length, resuelta: consultas.filter(c => c.estado === "resuelta").length };
@@ -102,10 +106,12 @@ export default function ConsultasTab() {
               <div className="px-4 pb-4 border-t border-white/06">
                 <div className="pt-4 grid sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 font-body text-sm text-white/60">
-                      <Mail size={12} style={{ color: "#E07B10" }} />
-                      <a href={`mailto:${c.email}`} className="hover:text-[#E07B10] transition-colors">{c.email}</a>
-                    </div>
+                    {c.email && (
+                      <div className="flex items-center gap-2 font-body text-sm text-white/60">
+                        <Mail size={12} style={{ color: "#E07B10" }} />
+                        <a href={`mailto:${c.email}`} className="hover:text-[#E07B10] transition-colors">{c.email}</a>
+                      </div>
+                    )}
                     {c.telefono && (
                       <div className="flex items-center gap-2 font-body text-sm text-white/60">
                         <Phone size={12} style={{ color: "#E07B10" }} />

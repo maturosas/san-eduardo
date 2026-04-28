@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { SiteConfig } from "@/types";
 import { Check, RefreshCw, BarChart3, Settings2, Eye, EyeOff, Share2 } from "lucide-react";
@@ -15,6 +15,9 @@ async function adminPost(action: string, payload: object) {
 
 const ANALYTICS_KEYS = ["analytics_ga4_id", "analytics_meta_pixel_id", "analytics_clarity_id"];
 const OG_KEYS = ["og_title", "og_description", "og_image_url"];
+const DEFAULT_CONFIG: SiteConfig[] = [
+  { key: "products_per_page", label: "Productos por página en rubros", value: "8" },
+];
 
 const ANALYTICS_HELP: Record<string, { label: string; placeholder: string; help: string }> = {
   analytics_ga4_id: {
@@ -42,14 +45,17 @@ export default function ConfigTab() {
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
   const [activeSection, setActiveSection] = useState<"general" | "og" | "analytics">("general");
 
-  useEffect(() => { load(); }, []);
-
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from("site_config").select("*").order("key");
-    setConfig((data as SiteConfig[]) || []);
+    const rows = (data as SiteConfig[]) || [];
+    const missing = DEFAULT_CONFIG.filter(item => !rows.some(row => row.key === item.key));
+    setConfig([...rows, ...missing].sort((a, b) => a.key.localeCompare(b.key)));
     setLoading(false);
-  }
+  }, []);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load(); }, [load]);
 
   const updateLocal = (key: string, value: string) =>
     setConfig(prev => prev.map(c => c.key === key ? { ...c, value } : c));

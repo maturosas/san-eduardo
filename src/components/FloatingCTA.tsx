@@ -21,7 +21,7 @@ export default function FloatingCTA() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3"
+          className="fixed bottom-6 right-6 z-50 hidden md:flex flex-col items-end gap-3"
         >
           {/* Expanded options */}
           <AnimatePresence>

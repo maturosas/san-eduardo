@@ -23,6 +23,7 @@ export type RubroItem = {
   meta_description: string | null;
   price: number | null;
   promo_price: number | null;
+  stock: number | null;
   image_url: string | null;
   badge: string;
   active: boolean;
@@ -53,7 +54,7 @@ export type Consulta = {
   id: string;
   nombre: string;
   telefono: string | null;
-  email: string;
+  email: string | null;
   zona: string | null;
   mensaje: string;
   estado: "nueva" | "en_contacto" | "resuelta";

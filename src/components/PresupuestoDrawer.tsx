@@ -11,7 +11,7 @@ function formatPrecio(p: number) {
 
 export default function PresupuestoDrawer() {
   const { items, removeItem, updateCantidad, clear, isOpen, setIsOpen, notification, clearNotification, total } = usePresupuesto();
-  const [form, setForm] = useState({ nombre: "", telefono: "", email: "", mensaje: "" });
+  const [form, setForm] = useState({ nombre: "", telefono: "", email: "", mensaje: "", website: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
 
   const count = items.reduce((a, i) => a + i.cantidad, 0);
@@ -40,7 +40,7 @@ export default function PresupuestoDrawer() {
       if (!res.ok) throw new Error();
       setStatus("ok");
       clear();
-      setForm({ nombre: "", telefono: "", email: "", mensaje: "" });
+      setForm({ nombre: "", telefono: "", email: "", mensaje: "", website: "" });
     } catch {
       setStatus("error");
     }
@@ -243,6 +243,15 @@ export default function PresupuestoDrawer() {
 
                   {/* Contact form */}
                   <form onSubmit={handleSubmit} className="p-4 pt-3 space-y-3">
+                    <input
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={form.website}
+                      onChange={e => setForm(p => ({ ...p, website: e.target.value }))}
+                      className="hidden"
+                      aria-hidden="true"
+                    />
                     <p className="font-body text-xs font-semibold uppercase tracking-widest" style={{ color: "#0D4A72" }}>
                       Tus datos para cotizar
                     </p>
@@ -264,7 +273,7 @@ export default function PresupuestoDrawer() {
                     <button type="submit" disabled={status === "loading" || !form.nombre || !form.email}
                       className="flex items-center justify-center gap-2 w-full py-3.5 font-body font-bold text-sm text-white disabled:opacity-50 transition-all"
                       style={{ background: "#C41E2A", borderRadius: "4px" }}>
-                      {status === "loading" ? "Enviando..." : <><Send size={14} /> Enviar presupuesto</>}
+                      {status === "loading" ? "Enviando..." : <><Send size={14} /> Pedir mi presupuesto</>}
                     </button>
                     <button type="button" onClick={clear}
                       className="w-full font-body text-xs text-[#9DAEBF] hover:text-red-400 transition-colors py-1">

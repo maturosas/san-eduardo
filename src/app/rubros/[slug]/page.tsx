@@ -11,7 +11,12 @@ import Link from "next/link";
 import { getWhatsAppUrlByRubro } from "@/lib/whatsapp";
 import type { Metadata } from "next";
 
-type Props = { params: Promise<{ slug: string }> };
+const BASE = "https://saneduardodesign.com.ar";
+
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ page?: string }>;
+};
 
 function toSlug(str: string) {
   return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -25,25 +30,46 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${data.name} | San Eduardo Design · Temperley`,
     description: `${data.description} Consultá precios y pedí presupuesto online. Entrega en todo el GBA Sur.`,
+    alternates: { canonical: `${BASE}/rubros/${slug}` },
+    openGraph: {
+      title: `${data.name} | San Eduardo Design`,
+      description: `${data.description} Consultá precios y pedí presupuesto online. Entrega en todo el GBA Sur.`,
+      url: `${BASE}/rubros/${slug}`,
+      siteName: "San Eduardo Design",
+      locale: "es_AR",
+      type: "website",
+    },
   };
 }
 
 export const revalidate = 60;
 
-export default async function RubroPage({ params }: Props) {
+export default async function RubroPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = await searchParams;
   const db = serverClient();
+  const currentPage = Math.max(1, Number(sp?.page || 1) || 1);
 
   const { data: rubro } = await db.from("rubros").select("*").eq("slug", slug).eq("active", true).single();
   if (!rubro) notFound();
 
-  const { data: items } = await db
+  const { data: pageSizeConfig } = await db
+    .from("site_config")
+    .select("value")
+    .eq("key", "products_per_page")
+    .maybeSingle();
+
+  const pageSize = Math.min(48, Math.max(1, Number(pageSizeConfig?.value || 8) || 8));
+  const from = (currentPage - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data: items, count } = await db
     .from("rubro_items")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("rubro_id", (rubro as Rubro).id)
     .eq("active", true)
     .order("orden")
-    .limit(8);
+    .range(from, to);
 
   const { data: otrosRubros } = await db
     .from("rubros")
@@ -54,6 +80,8 @@ export default async function RubroPage({ params }: Props) {
     .limit(4);
 
   const r = rubro as Rubro;
+  const totalProducts = count || 0;
+  const totalPages = Math.max(1, Math.ceil(totalProducts / pageSize));
   const waLink = r.whatsapp_text
     ? `https://wa.me/5491121613339?text=${encodeURIComponent(r.whatsapp_text)}`
     : getWhatsAppUrlByRubro(r.name);
@@ -128,7 +156,7 @@ export default async function RubroPage({ params }: Props) {
                     </h2>
                     {products.length > 0 && (
                       <span className="font-body text-xs text-[#9DAEBF]">
-                        {products.length} {products.length === 1 ? "producto" : "productos"}
+                        {totalProducts} {totalProducts === 1 ? "producto" : "productos"}
                       </span>
                     )}
                   </div>
@@ -169,6 +197,48 @@ export default async function RubroPage({ params }: Props) {
                   <p className="font-body text-xs text-[#9DAEBF] mt-4 text-center">
                     Catálogo en actualización permanente. Consultanos por productos específicos.
                   </p>
+
+                  {totalPages > 1 && (
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
+                      {currentPage > 1 && (
+                        <Link
+                          href={`/rubros/${r.slug}?page=${currentPage - 1}`}
+                          className="font-body text-sm font-semibold px-4 py-2"
+                          style={{ color: "#0D4A72", border: "1px solid rgba(13,74,114,0.16)", borderRadius: "4px" }}
+                        >
+                          Anterior
+                        </Link>
+                      )}
+                      {Array.from({ length: totalPages }).map((_, idx) => {
+                        const page = idx + 1;
+                        const active = page === currentPage;
+                        return (
+                          <Link
+                            key={page}
+                            href={`/rubros/${r.slug}${page === 1 ? "" : `?page=${page}`}`}
+                            className="font-body text-sm font-semibold w-10 h-10 flex items-center justify-center"
+                            style={{
+                              background: active ? "#0D4A72" : "#FFFFFF",
+                              color: active ? "#FFFFFF" : "#0D4A72",
+                              border: "1px solid rgba(13,74,114,0.16)",
+                              borderRadius: "4px",
+                            }}
+                          >
+                            {page}
+                          </Link>
+                        );
+                      })}
+                      {currentPage < totalPages && (
+                        <Link
+                          href={`/rubros/${r.slug}?page=${currentPage + 1}`}
+                          className="font-body text-sm font-semibold px-4 py-2"
+                          style={{ color: "#0D4A72", border: "1px solid rgba(13,74,114,0.16)", borderRadius: "4px" }}
+                        >
+                          Siguiente
+                        </Link>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* CTA banner */}
@@ -207,11 +277,11 @@ export default async function RubroPage({ params }: Props) {
                       style={{ background: "#25D366", borderRadius: "4px" }}>
                       <MessageCircle size={14} /> WhatsApp
                     </a>
-                    <a href="/#contacto"
+                    <Link href="/#contacto"
                       className="flex items-center justify-center gap-2 w-full py-3 font-body font-semibold text-sm text-white"
                       style={{ background: "#C41E2A", borderRadius: "4px" }}>
                       Formulario de contacto
-                    </a>
+                    </Link>
                     <div className="mt-4 pt-4 border-t border-gray-100 space-y-1">
                       <p className="font-body text-xs text-[#5A6A7E]">📞 4264-4848 · 4264-7638</p>
                       <p className="font-body text-xs text-[#5A6A7E]">📍 Collivadino 57, Temperley</p>

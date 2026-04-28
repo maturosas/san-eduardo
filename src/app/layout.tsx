@@ -4,6 +4,7 @@ import "./globals.css";
 import AnalyticsScripts from "@/components/AnalyticsScripts";
 import Providers from "@/components/Providers";
 import PresupuestoDrawer from "@/components/PresupuestoDrawer";
+import StickyMobileCTA from "@/components/StickyMobileCTA";
 import { serverClient } from "@/lib/supabase";
 
 const displayFont = Bebas_Neue({
@@ -96,6 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           {children}
           <PresupuestoDrawer />
+          <StickyMobileCTA />
         </Providers>
       </body>
     </html>

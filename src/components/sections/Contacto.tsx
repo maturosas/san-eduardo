@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MessageCircle, Send, Check } from "lucide-react";
 
 export default function Contacto() {
-  const [form, setForm] = useState({ nombre: "", contacto: "", mensaje: "" });
+  const [form, setForm] = useState({ nombre: "", contacto: "", mensaje: "", website: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,11 +22,12 @@ export default function Contacto() {
           telefono: !isEmail ? form.contacto : null,
           zona: "",
           mensaje: form.mensaje || "Consulta general — sin mensaje adicional.",
+          website: form.website,
         }),
       });
       if (!res.ok) throw new Error();
       setStatus("ok");
-      setForm({ nombre: "", contacto: "", mensaje: "" });
+      setForm({ nombre: "", contacto: "", mensaje: "", website: "" });
     } catch {
       setStatus("error");
     }
@@ -122,6 +123,15 @@ export default function Contacto() {
                 className="p-6 sm:p-8 space-y-4"
                 style={{ background: "#FFFFFF", border: "1px solid rgba(13,74,114,0.1)", borderRadius: "6px", boxShadow: "0 4px 16px rgba(13,74,114,0.08)" }}
               >
+                <input
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={form.website}
+                  onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
+                  className="hidden"
+                  aria-hidden="true"
+                />
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="font-body text-xs font-semibold text-[#0D4A72] uppercase tracking-widest mb-1.5 block">Nombre *</label>

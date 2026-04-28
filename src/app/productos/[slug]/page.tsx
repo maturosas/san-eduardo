@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowLeft, CheckCircle, ClipboardList, MessageCircle, Phone } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 import { serverClient } from "@/lib/supabase";
 import { Rubro, RubroItem } from "@/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
 import BreadcrumbSchema from "@/components/BreadcrumbSchema";
+import ProductDetailActions from "@/components/ProductDetailActions";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 const BASE = "https://saneduardodesign.com.ar";
@@ -121,108 +122,106 @@ export default async function ProductPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
 
       <main>
-        <section className="pt-28 pb-12" style={{ background: "#0D4A72" }}>
+        <section className="pt-28 pb-10" style={{ background: "#0D4A72" }}>
           <div className="se-container">
-            <Link href={`/rubros/${rubro.slug}`} className="inline-flex items-center gap-2 font-body text-sm text-white/50 hover:text-white transition-colors mb-7">
+            <Link href={`/rubros/${rubro.slug}`} className="inline-flex items-center gap-2 font-body text-sm text-white/55 hover:text-white transition-colors mb-6">
               <ArrowLeft size={14} /> Volver a {rubro.name}
             </Link>
-            <div className="grid lg:grid-cols-2 gap-10 items-end">
-              <div>
-                <p className="font-body text-xs font-bold uppercase tracking-[0.22em] mb-3" style={{ color: "#FFD700" }}>
-                  {rubro.name}
-                </p>
-                <h1 className="font-display text-white leading-none mb-4" style={{ fontSize: "clamp(2.4rem, 6vw, 4.8rem)", letterSpacing: "0.03em" }}>
-                  {product.name.toUpperCase()}
-                </h1>
-                {product.description && (
-                  <p className="font-body text-white/65 text-lg max-w-xl leading-relaxed" style={{ fontWeight: 300 }}>
-                    {product.description}
-                  </p>
-                )}
-              </div>
-
-              <div className="p-5" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "6px" }}>
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-body text-xs text-white/45 uppercase tracking-widest mb-1">Precio</p>
-                    {price ? (
-                      <div className="flex items-baseline gap-3">
-                        <span className="font-display text-3xl text-white" style={{ letterSpacing: "0.03em" }}>{formatPrecio(price)}</span>
-                        {product.promo_price && product.price && (
-                          <span className="font-body text-sm text-white/35 line-through">{formatPrecio(product.price)}</span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="font-display text-3xl text-white/80" style={{ letterSpacing: "0.03em" }}>Consultar</span>
-                    )}
-                  </div>
-                  <span className="font-body text-xs font-bold uppercase tracking-widest px-3 py-1.5 text-white" style={{ background: "#C41E2A", borderRadius: "3px" }}>
-                    {product.badge || "Disponible"}
-                  </span>
-                </div>
-              </div>
+            <p className="font-body text-xs font-bold uppercase tracking-[0.22em] mb-3" style={{ color: "#FFD700" }}>
+              {rubro.name}
+            </p>
+            <h1 className="font-display text-white leading-none max-w-4xl mb-3" style={{ fontSize: "clamp(2.2rem, 5vw, 4.6rem)", letterSpacing: "0.03em" }}>
+              {product.name.toUpperCase()}
+            </h1>
+            {product.description && (
+              <p className="font-body text-white/65 text-lg max-w-2xl leading-relaxed" style={{ fontWeight: 300 }}>
+                {product.description}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-2 mt-6">
+              <span className="font-body text-xs font-bold uppercase tracking-widest px-3 py-1.5 text-white" style={{ background: "#C41E2A", borderRadius: "3px" }}>
+                {product.badge || "Disponible"}
+              </span>
+              <span className="font-body text-xs font-semibold uppercase tracking-widest px-3 py-1.5 text-white/70" style={{ border: "1px solid rgba(255,255,255,0.18)", borderRadius: "3px" }}>
+                Entrega en GBA Sur
+              </span>
             </div>
           </div>
         </section>
 
         <section className="py-14" style={{ background: "#F4F8FC" }}>
           <div className="se-container">
-            <div className="grid lg:grid-cols-3 gap-12">
-              <div className="lg:col-span-2">
-                <div className="overflow-hidden mb-8" style={{ background: "#E8EFF6", borderRadius: "6px", border: "1px solid rgba(13,74,114,0.1)" }}>
+            <div className="grid lg:grid-cols-12 gap-8 xl:gap-12 items-start">
+              <div className="lg:col-span-7">
+                <div className="overflow-hidden" style={{ background: "#E8EFF6", borderRadius: "6px", border: "1px solid rgba(13,74,114,0.1)", aspectRatio: "1/1" }}>
                   {product.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={product.image_url} alt={`${product.name} en San Eduardo Design`} className="w-full object-cover" style={{ maxHeight: "520px" }} />
+                    <img src={product.image_url} alt={`${product.name} en San Eduardo Design`} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="flex items-center justify-center" style={{ minHeight: "360px" }}>
+                    <div className="flex items-center justify-center w-full h-full">
                       <span className="font-display text-7xl" style={{ color: "#0D4A72", opacity: 0.12, letterSpacing: "0.1em" }}>SE</span>
                     </div>
                   )}
                 </div>
-
-                <article className="p-6 sm:p-8" style={{ background: "#FFFFFF", border: "1px solid rgba(13,74,114,0.1)", borderRadius: "6px" }}>
-                  <h2 className="font-display text-2xl mb-4" style={{ color: "#0D4A72", letterSpacing: "0.04em" }}>
-                    DETALLE DEL PRODUCTO
-                  </h2>
-                  {product.long_description ? (
-                    <div className="space-y-4">
-                      {product.long_description.split("\n").filter(Boolean).map((p, i) => (
-                        <p key={i} className="font-body text-[#2D4A5E] leading-relaxed" style={{ fontWeight: 300 }}>
-                          {p}
-                        </p>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="font-body text-[#5A6A7E] leading-relaxed" style={{ fontWeight: 300 }}>
-                      Consultá disponibilidad, precio actualizado y opciones de entrega para {product.name}. Te asesoramos según el tipo de obra, cantidad necesaria y zona de entrega.
-                    </p>
-                  )}
-                </article>
+                <p className="font-body text-xs text-[#9DAEBF] mt-3">
+                  Recomendación para nuevas imágenes: formato cuadrado 1:1 para que se vea bien en catálogo, producto y redes.
+                </p>
               </div>
 
-              <aside>
+              <aside className="lg:col-span-5">
                 <div className="sticky top-24 space-y-5">
                   <div className="p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(13,74,114,0.12)", borderRadius: "6px", boxShadow: "0 4px 16px rgba(13,74,114,0.08)" }}>
-                    <h3 className="font-display text-lg mb-2" style={{ color: "#0D4A72", letterSpacing: "0.04em" }}>PEDIR COTIZACIÓN</h3>
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div>
+                        <p className="font-body text-xs text-[#9DAEBF] uppercase tracking-widest mb-1">Precio</p>
+                        {price ? (
+                          <div className="flex items-baseline gap-3">
+                            <span className="font-display text-4xl" style={{ color: "#0D4A72", letterSpacing: "0.03em" }}>{formatPrecio(price)}</span>
+                            {product.promo_price && product.price && (
+                              <span className="font-body text-sm text-[#9DAEBF] line-through">{formatPrecio(product.price)}</span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="font-display text-4xl" style={{ color: "#0D4A72", letterSpacing: "0.03em" }}>Consultar</span>
+                        )}
+                      </div>
+                    </div>
+                    <h2 className="font-display text-xl mb-2" style={{ color: "#0D4A72", letterSpacing: "0.04em" }}>PEDIR COTIZACIÓN</h2>
                     <p className="font-body text-sm text-[#5A6A7E] mb-4" style={{ fontWeight: 300 }}>
-                      Te confirmamos stock, precio y entrega en horario comercial.
+                      Agregalo a tu presupuesto o consultanos stock, precio actualizado y entrega.
                     </p>
-                    <a href={waLink} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 font-body font-semibold text-sm text-white mb-2"
-                      style={{ background: "#25D366", borderRadius: "4px" }}>
-                      <MessageCircle size={14} /> Consultar por WhatsApp
-                    </a>
-                    <Link href="/#contacto"
-                      className="flex items-center justify-center gap-2 w-full py-3 font-body font-semibold text-sm text-white mb-2"
-                      style={{ background: "#C41E2A", borderRadius: "4px" }}>
-                      <ClipboardList size={14} /> Pedir presupuesto
-                    </Link>
-                    <a href="tel:+541142644848"
-                      className="flex items-center justify-center gap-2 w-full py-3 font-body font-semibold text-sm"
-                      style={{ color: "#0D4A72", border: "1px solid rgba(13,74,114,0.16)", borderRadius: "4px" }}>
-                      <Phone size={14} /> 4264-4848
-                    </a>
+                    <ProductDetailActions
+                      whatsappUrl={waLink}
+                      product={{
+                        id: product.id,
+                        nombre: product.name,
+                        precio: product.price,
+                        precioPromo: product.promo_price,
+                        rubro: rubro.name,
+                        rubroSlug: rubro.slug,
+                        imagen: product.image_url,
+                      }}
+                    />
                   </div>
+
+                  <article className="p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(13,74,114,0.1)", borderRadius: "6px" }}>
+                    <h2 className="font-display text-xl mb-4" style={{ color: "#0D4A72", letterSpacing: "0.04em" }}>
+                      DETALLE DEL PRODUCTO
+                    </h2>
+                    {product.long_description ? (
+                      <div className="space-y-4">
+                        {product.long_description.split("\n").filter(Boolean).map((p, i) => (
+                          <p key={i} className="font-body text-[#2D4A5E] leading-relaxed" style={{ fontWeight: 300 }}>
+                            {p}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="font-body text-[#5A6A7E] leading-relaxed" style={{ fontWeight: 300 }}>
+                        Consultá disponibilidad, precio actualizado y opciones de entrega para {product.name}. Te asesoramos según el tipo de obra, cantidad necesaria y zona de entrega.
+                      </p>
+                    )}
+                  </article>
 
                   <div className="p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(13,74,114,0.08)", borderRadius: "6px" }}>
                     <h4 className="font-display text-sm mb-3" style={{ color: "#0D4A72", letterSpacing: "0.08em" }}>INFO ÚTIL</h4>

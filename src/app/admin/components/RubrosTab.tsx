@@ -43,8 +43,8 @@ export default function RubrosTab() {
     setLoading(false);
   }
 
-  async function loadItems(rubroId: string) {
-    if (items[rubroId]) return;
+  async function loadItems(rubroId: string, force = false) {
+    if (items[rubroId] && !force) return;
     const { data } = await supabase.from("rubro_items").select("*").eq("rubro_id", rubroId).order("orden");
     setItems(prev => ({ ...prev, [rubroId]: (data as RubroItem[]) || [] }));
   }
@@ -120,8 +120,12 @@ export default function RubrosTab() {
 
   const deleteItem = async (id: string, rubroId: string) => {
     if (!confirm("¿Eliminar este producto?")) return;
-    await adminPost("delete_rubro_item", { id });
-    setItems(prev => ({ ...prev, [rubroId]: prev[rubroId].filter(i => i.id !== id) }));
+    try {
+      await adminPost("delete_rubro_item", { id });
+      await loadItems(rubroId, true);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "No se pudo borrar el producto");
+    }
   };
 
   if (loading) return <div className="text-center py-12 font-body text-white/30">Cargando rubros...</div>;
@@ -427,7 +431,7 @@ function ItemForm({
       <ImageUploader
         value={item.image_url || ""}
         onChange={url => onChange(p => p ? { ...p, image_url: url } : p)}
-        label="Imagen del producto"
+        label="Imagen del producto · recomendado cuadrada 1:1"
       />
 
       {/* Actions */}

@@ -10,6 +10,8 @@ import { ArrowLeft, Calendar, Clock, MessageCircle, ArrowRight } from "lucide-re
 import { parseContent } from "@/lib/parseContent";
 import type { Metadata } from "next";
 
+const BASE = "https://saneduardodesign.com.ar";
+
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -21,7 +23,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${post.title} | San Eduardo Design`,
     description: post.excerpt || "",
-    openGraph: post.image_url ? { images: [{ url: post.image_url }] } : undefined,
+    alternates: { canonical: `${BASE}/blog/${slug}` },
+    openGraph: {
+      title: `${post.title} | San Eduardo Design`,
+      description: post.excerpt || "",
+      url: `${BASE}/blog/${slug}`,
+      siteName: "San Eduardo Design",
+      locale: "es_AR",
+      type: "article",
+      images: post.image_url ? [{ url: post.image_url, alt: post.title || "San Eduardo Design" }] : undefined,
+    },
+    twitter: {
+      card: post.image_url ? "summary_large_image" : "summary",
+      title: `${post.title} | San Eduardo Design`,
+      description: post.excerpt || "",
+      images: post.image_url ? [post.image_url] : undefined,
+    },
   };
 }
 
@@ -66,6 +83,18 @@ export default async function BlogPostPage({ params }: Props) {
     "General": "#5A6A7E",
   };
   const catColor = CATEGORY_COLORS[post.category] || "#0D4A72";
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt || post.title,
+    image: post.image_url ? [post.image_url] : undefined,
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at || post.published_at || post.created_at,
+    author: { "@type": "Organization", name: "San Eduardo Design" },
+    publisher: { "@type": "Organization", name: "San Eduardo Design" },
+    mainEntityOfPage: `${BASE}/blog/${post.slug}`,
+  };
 
   return (
     <>
@@ -75,6 +104,7 @@ export default async function BlogPostPage({ params }: Props) {
         { name: "Blog", url: "/blog" },
         { name: post.title, url: `/blog/${post.slug}` },
       ]} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
 
       <main>
         {/* Article hero */}
