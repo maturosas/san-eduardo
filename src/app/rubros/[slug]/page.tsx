@@ -8,7 +8,7 @@ import BreadcrumbSchema from "@/components/BreadcrumbSchema";
 import ProductCard, { ProductCardData } from "@/components/ProductCard";
 import { ArrowLeft, MessageCircle, Phone, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { getWhatsAppUrlByRubro } from "@/lib/whatsapp";
+import { getWhatsAppUrl, getWhatsAppUrlByRubro } from "@/lib/whatsapp";
 import type { Metadata } from "next";
 
 const BASE = "https://saneduardodesign.com.ar";
@@ -83,7 +83,7 @@ export default async function RubroPage({ params, searchParams }: Props) {
   const totalProducts = count || 0;
   const totalPages = Math.max(1, Math.ceil(totalProducts / pageSize));
   const waLink = r.whatsapp_text
-    ? `https://wa.me/5491121613339?text=${encodeURIComponent(r.whatsapp_text)}`
+    ? getWhatsAppUrl(r.whatsapp_text)
     : getWhatsAppUrlByRubro(r.name);
 
   // Map DB items → ProductCardData
