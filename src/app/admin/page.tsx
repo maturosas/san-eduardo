@@ -1,15 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
-import { LogOut, RefreshCw, MessageSquare, Layers, FileText, Settings, Star } from "lucide-react";
+import { LogOut, RefreshCw, MessageSquare, Layers, FileText, Settings, Star, PanelsTopLeft } from "lucide-react";
 import ConsultasTab from "./components/ConsultasTab";
 import RubrosTab from "./components/RubrosTab";
 import BlogTab from "./components/BlogTab";
 import ConfigTab from "./components/ConfigTab";
 import TestimoniosTab from "./components/TestimoniosTab";
+import ContentTab from "./components/ContentTab";
 
 const TABS = [
   { id: "consultas", label: "Consultas", icon: MessageSquare },
   { id: "rubros", label: "Rubros", icon: Layers },
+  { id: "contenido", label: "Contenido", icon: PanelsTopLeft },
   { id: "blog", label: "Blog", icon: FileText },
   { id: "testimonios", label: "Testimonios", icon: Star },
   { id: "config", label: "Configuración", icon: Settings },
@@ -115,6 +117,7 @@ export default function AdminPage() {
         <div key={`${tab}-${refreshKey}`}>
           {tab === "consultas" && <ConsultasTab />}
           {tab === "rubros" && <RubrosTab />}
+          {tab === "contenido" && <ContentTab />}
           {tab === "blog" && <BlogTab />}
           {tab === "testimonios" && <TestimoniosTab />}
           {tab === "config" && <ConfigTab />}

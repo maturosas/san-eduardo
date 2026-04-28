@@ -1,5 +1,6 @@
-import Image from "next/image";
 import { Phone, Mail, MapPin } from "lucide-react";
+import { CONTENT_DEFAULTS, SiteContent } from "@/lib/contentDefaults";
+import { getSiteContent } from "@/lib/siteContent";
 
 const IconInstagram = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -20,7 +21,9 @@ const IconYoutube = () => (
   </svg>
 );
 
-export default function Footer() {
+export default async function Footer({ content }: { content?: SiteContent }) {
+  const c = content || await getSiteContent();
+
   return (
     <footer style={{ background: "#0A3055", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
       <div className="se-container pt-20 pb-12">
@@ -28,8 +31,9 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="mb-6 inline-block" style={{ background: "#FFFFFF", padding: "6px 12px", borderRadius: "4px" }}>
-              <Image
-                src="/images/logo-color.jpg"
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={c.footer_logo_url || CONTENT_DEFAULTS.footer_logo_url}
                 alt="San Eduardo Design — Corralón materiales construcción desde 1964"
                 width={160}
                 height={54}
@@ -37,8 +41,7 @@ export default function Footer() {
               />
             </div>
             <p className="font-body text-white/40 text-sm leading-relaxed mb-6" style={{ fontWeight: 300 }}>
-              Corralón de materiales de construcción en Temperley.
-              Más de 60 años al servicio del GBA Sur.
+              {(c.footer_description || CONTENT_DEFAULTS.footer_description).split("\n").map(line => <span key={line} className="block">{line}</span>)}
             </p>
             <div className="flex gap-3">
               {[
@@ -143,9 +146,8 @@ export default function Footer() {
               © {new Date().getFullYear()} San Eduardo Design. Todos los derechos reservados.
             </p>
             <p className="font-body text-xs text-white/15 text-center">
-              by -{" "}
-              <a href="https://agencia-plan.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white/40 transition-colors">
-                agenciaboutique
+              <a href={c.footer_credit_url || CONTENT_DEFAULTS.footer_credit_url} target="_blank" rel="noopener noreferrer" className="hover:text-white/40 transition-colors">
+                {c.footer_credit_label || CONTENT_DEFAULTS.footer_credit_label}
               </a>
             </p>
           </div>

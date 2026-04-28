@@ -1,25 +1,36 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Menu, X, Phone } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { CONTENT_DEFAULTS } from "@/lib/contentDefaults";
 
-const NAV_LINKS = [
-  { href: "/#rubros", label: "Rubros" },
-  { href: "/#nosotros", label: "Nosotros" },
-  { href: "/#zonas", label: "Zona de entrega" },
-  { href: "/#contacto", label: "Contacto" },
-];
+const NAV_KEYS = ["header_logo_url", "nav_rubros_label", "nav_nosotros_label", "nav_zonas_label", "nav_contacto_label", "nav_cta_label"];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [content, setContent] = useState(CONTENT_DEFAULTS);
+  const navLinks = [
+    { href: "/#rubros", label: content.nav_rubros_label },
+    { href: "/#nosotros", label: content.nav_nosotros_label },
+    { href: "/#zonas", label: content.nav_zonas_label },
+    { href: "/#contacto", label: content.nav_contacto_label },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    supabase.from("site_config").select("key,value").in("key", NAV_KEYS)
+      .then(({ data }) => {
+        const remote = Object.fromEntries((data || []).map(row => [row.key, row.value || ""]));
+        setContent(prev => ({ ...prev, ...remote }));
+      });
   }, []);
 
   return (
@@ -39,20 +50,20 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <div style={{ background: "#FFFFFF", padding: "6px 12px", borderRadius: "4px" }}>
-              <Image
-                src="/images/logo-color.jpg"
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={content.header_logo_url}
                 alt="San Eduardo Design — Corralón materiales de construcción Temperley GBA Sur"
                 width={160}
                 height={52}
                 className="h-9 w-auto"
-                priority
               />
             </div>
           </Link>
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
-            {NAV_LINKS.map((l) => (
+            {navLinks.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
@@ -71,7 +82,7 @@ export default function Navbar() {
               style={{ background: "#C41E2A", borderRadius: "4px" }}
             >
               <Phone size={13} />
-              Pedir presupuesto
+              {content.nav_cta_label}
             </Link>
           </div>
 
@@ -90,7 +101,7 @@ export default function Navbar() {
       {open && (
         <div style={{ background: "rgba(13,74,114,0.98)", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
           <div className="se-container py-5 flex flex-col gap-1">
-            {NAV_LINKS.map((l) => (
+            {navLinks.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
@@ -107,7 +118,7 @@ export default function Navbar() {
               style={{ background: "#C41E2A", borderRadius: "4px" }}
             >
               <Phone size={14} />
-              Pedir presupuesto
+              {content.nav_cta_label}
             </Link>
           </div>
         </div>

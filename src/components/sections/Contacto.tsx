@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, Mail, MessageCircle, Send, Check } from "lucide-react";
+import { CONTENT_DEFAULTS, SiteContent } from "@/lib/contentDefaults";
 
-export default function Contacto() {
+export default function Contacto({ content = CONTENT_DEFAULTS }: { content?: SiteContent }) {
   const [form, setForm] = useState({ nombre: "", contacto: "", mensaje: "", website: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
 
@@ -43,14 +44,14 @@ export default function Contacto() {
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="h-1 w-10" style={{ background: "#C41E2A", borderRadius: "2px" }} />
-            <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>Hablemos</span>
+            <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>{content.contacto_eyebrow}</span>
             <div className="h-1 w-10" style={{ background: "#C41E2A", borderRadius: "2px" }} />
           </div>
           <h2 className="font-display leading-none" style={{ fontSize: "clamp(2rem,5vw,3.8rem)", color: "#0D4A72", letterSpacing: "0.02em" }}>
-            PEDÍ TU PRESUPUESTO.
+            {content.contacto_title}
           </h2>
           <p className="font-body text-[#5A6A7E] text-base mt-3 max-w-md mx-auto" style={{ fontWeight: 300 }}>
-            Dejanos tus datos y te respondemos en el día.
+            {content.contacto_description}
           </p>
         </div>
 

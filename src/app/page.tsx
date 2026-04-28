@@ -7,20 +7,23 @@ import Zonas from "@/components/sections/Zonas";
 import Contacto from "@/components/sections/Contacto";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
+import { getSiteContent } from "@/lib/siteContent";
 
-export default function Home() {
+export default async function Home() {
+  const content = await getSiteContent();
+
   return (
     <>
       <Navbar />
       <main>
-        <Hero />
-        <Rubros />
-        <Nosotros />
-        <Testimonios />
-        <Zonas />
-        <Contacto />
+        <Hero content={content} />
+        <Rubros content={content} />
+        <Nosotros content={content} />
+        <Testimonios content={content} />
+        <Zonas content={content} />
+        <Contacto content={content} />
       </main>
-      <Footer />
+      <Footer content={content} />
       <FloatingCTA />
     </>
   );

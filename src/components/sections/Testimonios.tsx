@@ -1,8 +1,9 @@
 import { serverClient } from "@/lib/supabase";
 import { TESTIMONIOS as FALLBACK } from "@/data/testimonios";
 import TestimoniosGrid from "./TestimoniosGrid";
+import { CONTENT_DEFAULTS, SiteContent } from "@/lib/contentDefaults";
 
-export default async function Testimonios() {
+export default async function Testimonios({ content = CONTENT_DEFAULTS }: { content?: SiteContent }) {
   let items = FALLBACK;
 
   try {
@@ -25,5 +26,5 @@ export default async function Testimonios() {
     }
   } catch { /* use fallback */ }
 
-  return <TestimoniosGrid items={items} />;
+  return <TestimoniosGrid items={items} content={content} />;
 }

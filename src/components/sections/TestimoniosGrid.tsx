@@ -3,8 +3,10 @@
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { Testimonio } from "@/data/testimonios";
+import { CONTENT_DEFAULTS, SiteContent } from "@/lib/contentDefaults";
+import { splitLines } from "@/lib/siteContent";
 
-export default function TestimoniosGrid({ items }: { items: Testimonio[] }) {
+export default function TestimoniosGrid({ items, content = CONTENT_DEFAULTS }: { items: Testimonio[]; content?: SiteContent }) {
   if (!items.length) return null;
 
   return (
@@ -14,12 +16,13 @@ export default function TestimoniosGrid({ items }: { items: Testimonio[] }) {
           <div className="flex items-center gap-3 mb-3">
             <div className="h-1 w-10" style={{ background: "#C41E2A", borderRadius: "2px" }} />
             <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>
-              Lo que dicen nuestros clientes
+              {content.testimonios_eyebrow}
             </span>
           </div>
           <h2 className="font-display leading-none" style={{ fontSize: "clamp(2rem,5vw,3.8rem)", color: "#0D4A72", letterSpacing: "0.02em" }}>
-            CLIENTES QUE CONSTRUYERON<br />
-            <span style={{ color: "#C41E2A" }}>CON NOSOTROS.</span>
+            {splitLines(content.testimonios_title).map((line, i) => (
+              <span key={line} className="block" style={{ color: i === 1 ? "#C41E2A" : "#0D4A72" }}>{line}</span>
+            ))}
           </h2>
         </div>
 

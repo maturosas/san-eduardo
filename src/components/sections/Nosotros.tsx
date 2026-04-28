@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { ShieldCheck, Truck, Users, Award } from "lucide-react";
+import { CONTENT_DEFAULTS, SiteContent } from "@/lib/contentDefaults";
+import { splitLines } from "@/lib/siteContent";
 
 const PILARES = [
   { icon: ShieldCheck, title: "Calidad sin negociar", desc: "Solo trabajamos con marcas que conocemos y respaldamos." },
@@ -11,7 +12,7 @@ const PILARES = [
   { icon: Award, title: "60 años de trayectoria", desc: "Tres generaciones construyendo confianza obra por obra." },
 ];
 
-export default function Nosotros() {
+export default function Nosotros({ content = CONTENT_DEFAULTS }: { content?: SiteContent }) {
   return (
     <section id="nosotros" className="py-16 md:py-24" style={{ background: "#F4F8FC" }}>
       <div className="se-container">
@@ -24,8 +25,9 @@ export default function Nosotros() {
             transition={{ duration: 0.6 }}
           >
             <div className="relative mb-8 overflow-hidden" style={{ borderRadius: "4px" }}>
-              <Image
-                src="/images/construccion.jpg"
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={content.nosotros_image}
                 alt="Obra de construcción con materiales de San Eduardo Design — Temperley GBA Sur"
                 width={600}
                 height={380}
@@ -43,20 +45,20 @@ export default function Nosotros() {
 
             <div className="flex items-center gap-3 mb-3">
               <div className="h-1 w-10" style={{ background: "#C41E2A", borderRadius: "2px" }} />
-              <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>Quiénes somos</span>
+              <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>{content.nosotros_eyebrow}</span>
             </div>
             <h2 className="font-display leading-none mb-5" style={{ fontSize: "clamp(2rem,5vw,3.8rem)", color: "#0D4A72", letterSpacing: "0.02em" }}>
-              MÁS DE 60 AÑOS<br />EN LA ZONA SUR.
+              {splitLines(content.nosotros_title).map(line => <span key={line} className="block">{line}</span>)}
             </h2>
             <div className="space-y-3 font-body text-[#5A6A7E] leading-relaxed" style={{ fontWeight: 300 }}>
               <p className="text-base text-[#0D4A72]" style={{ fontWeight: 500 }}>
-                San Eduardo Design nació en Temperley en 1964 y nunca se fue.
+                {content.nosotros_lead}
               </p>
               <p className="text-sm sm:text-base">
-                Lo que empezó como un pequeño corralón familiar se convirtió en el referente de la zona sur para constructores, arquitectos y particulares.
+                {content.nosotros_text_1}
               </p>
               <p className="text-sm sm:text-base">
-                Hoy contamos con más de 7.500 m² de depósito, 15.000 artículos en stock y un equipo que conoce cada producto que vendemos.
+                {content.nosotros_text_2}
               </p>
             </div>
           </motion.div>

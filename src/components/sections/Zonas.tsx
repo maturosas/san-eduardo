@@ -2,15 +2,12 @@
 
 import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
+import { CONTENT_DEFAULTS, SiteContent } from "@/lib/contentDefaults";
+import { splitLines } from "@/lib/siteContent";
 
-const ZONAS = [
-  "Temperley", "Lomas de Zamora", "Banfield", "Adrogué",
-  "Lanús", "Quilmes", "Almirante Brown", "Bernal",
-  "Wilde", "Avellaneda", "Berazategui", "Florencio Varela",
-  "Monte Grande", "San Justo", "La Plata", "Ezeiza",
-];
+export default function Zonas({ content = CONTENT_DEFAULTS }: { content?: SiteContent }) {
+  const zonas = content.zonas_list.split(",").map(z => z.trim()).filter(Boolean);
 
-export default function Zonas() {
   return (
     <section id="zonas" className="py-16 md:py-24" style={{ background: "#FFFFFF" }}>
       <div className="se-container">
@@ -24,14 +21,13 @@ export default function Zonas() {
           >
             <div className="flex items-center gap-3 mb-3">
               <div className="h-1 w-10" style={{ background: "#C41E2A", borderRadius: "2px" }} />
-              <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>Dónde llegamos</span>
+              <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>{content.zonas_eyebrow}</span>
             </div>
             <h2 className="font-display leading-none mb-5" style={{ fontSize: "clamp(2rem,5vw,3.8rem)", color: "#0D4A72", letterSpacing: "0.02em" }}>
-              ZONA DE<br />ENTREGA.
+              {splitLines(content.zonas_title).map(line => <span key={line} className="block">{line}</span>)}
             </h2>
             <p className="font-body text-[#5A6A7E] text-base leading-relaxed mb-7" style={{ fontWeight: 300 }}>
-              Hacemos entregas en todo el GBA Sur con fletes propios.
-              Coordinamos el horario con vos. Para obras grandes, consultá condiciones especiales.
+              {content.zonas_description}
             </p>
 
             <div className="p-5 mb-5" style={{ background: "#F4F8FC", border: "1px solid rgba(13,74,114,0.12)", borderRadius: "4px", borderLeft: "4px solid #0D4A72" }}>
@@ -66,7 +62,7 @@ export default function Zonas() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="grid grid-cols-2 sm:grid-cols-2 gap-2.5">
-              {ZONAS.map((zona, i) => (
+              {zonas.map((zona, i) => (
                 <motion.div
                   key={zona}
                   initial={{ opacity: 0, scale: 0.95 }}

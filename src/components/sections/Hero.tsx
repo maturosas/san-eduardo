@@ -3,19 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { ArrowRight, MapPin, Clock, Phone } from "lucide-react";
-
-const SLIDES = [
-  {
-    img: "/images/showroom.jpg",
-    headline: ["TODO LO QUE", "TU OBRA", "NECESITA."],
-    sub: "Más de 15.000 artículos en stock. Marcas líderes. Asesoramiento real de quienes conocen el rubro.",
-  },
-  {
-    img: "/images/construccion.jpg",
-    headline: ["60 AÑOS", "CONSTRUYENDO", "LA ZONA SUR."],
-    sub: "Tres generaciones al servicio de arquitectos, constructores y propietarios del GBA Sur.",
-  },
-];
+import { CONTENT_DEFAULTS, SiteContent } from "@/lib/contentDefaults";
+import { splitLines } from "@/lib/siteContent";
 
 const STATS = [
   { num: "60+", label: "Años" },
@@ -24,16 +13,28 @@ const STATS = [
   { num: "30+", label: "Marcas" },
 ];
 
-export default function Hero() {
+export default function Hero({ content = CONTENT_DEFAULTS }: { content?: SiteContent }) {
+  const slides = [
+    {
+      img: content.hero_image_1,
+      headline: splitLines(content.hero_headline_1),
+      sub: content.hero_subtitle_1,
+    },
+    {
+      img: content.hero_image_2,
+      headline: splitLines(content.hero_headline_2),
+      sub: content.hero_subtitle_2,
+    },
+  ];
   const [current, setCurrent] = useState(0);
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
   useEffect(() => {
-    const t = setInterval(() => setCurrent((c) => (c + 1) % SLIDES.length), 5500);
+    const t = setInterval(() => setCurrent((c) => (c + 1) % slides.length), 5500);
     return () => clearInterval(t);
-  }, []);
+  }, [slides.length]);
 
   return (
     <section
@@ -55,7 +56,7 @@ export default function Hero() {
           <div
             className="absolute inset-0"
             style={{
-              backgroundImage: `url(${SLIDES[current].img})`,
+              backgroundImage: `url(${slides[current].img})`,
               backgroundSize: "cover",
               backgroundPosition: current === 0 ? "center 40%" : "center center",
               height: "110%",
@@ -83,7 +84,7 @@ export default function Hero() {
           >
             <div className="h-0.5 w-8" style={{ background: "#FFD700" }} />
             <span className="font-body text-xs font-bold tracking-[0.2em] uppercase" style={{ color: "#FFD700" }}>
-              San Eduardo Design · Desde 1964
+              {content.hero_eyebrow}
             </span>
           </motion.div>
 
@@ -98,7 +99,7 @@ export default function Hero() {
               className="font-display text-white leading-none mb-4"
               style={{ fontSize: "clamp(2.2rem, 7vw, 5.5rem)", letterSpacing: "0.03em" }}
             >
-              {SLIDES[current].headline.map((line, i) => (
+              {slides[current].headline.map((line, i) => (
                 <span key={i} className="block">
                   {i === 1 ? <span style={{ color: "#FFD700" }}>{line}</span> : line}
                 </span>
@@ -116,7 +117,7 @@ export default function Hero() {
               className="font-body text-white/65 leading-relaxed mb-7"
               style={{ fontSize: "clamp(0.95rem, 2vw, 1.05rem)", fontWeight: 300, maxWidth: "480px" }}
             >
-              {SLIDES[current].sub}
+              {slides[current].sub}
             </motion.p>
           </AnimatePresence>
 
@@ -132,7 +133,7 @@ export default function Hero() {
               className="inline-flex items-center justify-center gap-2 font-body font-bold text-sm px-6 py-3.5 text-white group transition-all hover:opacity-90"
               style={{ background: "#C41E2A", borderRadius: "4px", boxShadow: "0 4px 16px rgba(196,30,42,0.4)" }}
             >
-              Pedir presupuesto
+              {content.hero_primary_cta}
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a
@@ -140,7 +141,7 @@ export default function Hero() {
               className="inline-flex items-center justify-center gap-2 font-body font-semibold text-sm px-6 py-3.5 text-white hover:bg-white/15 transition-all"
               style={{ border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: "4px" }}
             >
-              Ver rubros →
+              {content.hero_secondary_cta}
             </a>
             <a
               href="tel:+541142644848"
@@ -194,7 +195,7 @@ export default function Hero() {
 
       {/* Slide indicators */}
       <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
-        {SLIDES.map((_, i) => (
+        {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { Rubro } from "@/types";
 import { ArrowRight } from "lucide-react";
+import { CONTENT_DEFAULTS, SiteContent } from "@/lib/contentDefaults";
 
 const FALLBACK: Rubro[] = [
   { id:"1", name:"Cerámicas y Pisos", slug:"ceramicas-y-pisos", description:"Porcellanato, cerámicas nacionales e importadas.", long_description:"", icon:"⬛", whatsapp_text:"", image_url:null, active:true, orden:1, created_at:"" },
@@ -18,7 +19,7 @@ const FALLBACK: Rubro[] = [
   { id:"8", name:"Herramientas", slug:"herramientas", description:"Manuales, eléctricas y accesorios para toda obra.", long_description:"", icon:"🔨", whatsapp_text:"", image_url:null, active:true, orden:8, created_at:"" },
 ];
 
-export default function Rubros() {
+export default function Rubros({ content = CONTENT_DEFAULTS }: { content?: SiteContent }) {
   const [rubros, setRubros] = useState<Rubro[]>(FALLBACK);
 
   useEffect(() => {
@@ -32,11 +33,11 @@ export default function Rubros() {
         <div className="mb-14">
           <div className="flex items-center gap-3 mb-3">
             <div className="h-1 w-10" style={{ background: "#C41E2A", borderRadius: "2px" }} />
-            <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>Lo que encontrás</span>
+            <span className="font-body text-xs font-bold tracking-[0.25em] uppercase" style={{ color: "#C41E2A" }}>{content.rubros_eyebrow}</span>
           </div>
-          <h2 className="font-display leading-none" style={{ fontSize: "clamp(2.4rem,5vw,3.8rem)", color: "#0D4A72", letterSpacing: "0.02em" }}>RUBROS</h2>
+          <h2 className="font-display leading-none" style={{ fontSize: "clamp(2.4rem,5vw,3.8rem)", color: "#0D4A72", letterSpacing: "0.02em" }}>{content.rubros_title}</h2>
           <p className="font-body text-[#5A6A7E] text-lg mt-3 max-w-xl" style={{ fontWeight: 300 }}>
-            Todo para construir, reformar o terminar. Hacé clic en cada rubro para ver productos y pedir presupuesto.
+            {content.rubros_description}
           </p>
         </div>
 
