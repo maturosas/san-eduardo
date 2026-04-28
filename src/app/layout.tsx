@@ -24,7 +24,7 @@ const bodyFont = Barlow({
 export async function generateMetadata(): Promise<Metadata> {
   let ogTitle = "San Eduardo Design | Corralón en Temperley, GBA Sur";
   let ogDesc = "Más de 60 años proveyendo materiales de construcción. Cerámicas, sanitarios, hierro, cemento y más. Entrega en todo el GBA Sur desde Temperley.";
-  let ogImage = "https://san-eduardo.vercel.app/images/og-san-eduardo.jpg?v=2";
+  let ogImage = "https://san-eduardo.vercel.app/images/og-san-eduardo-preview.jpg";
 
   try {
     const db = serverClient();
