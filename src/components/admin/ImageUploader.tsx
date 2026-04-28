@@ -7,9 +7,10 @@ interface Props {
   onChange: (url: string) => void;
   label?: string;
   className?: string;
+  squarePreview?: boolean;
 }
 
-export default function ImageUploader({ value, onChange, label, className }: Props) {
+export default function ImageUploader({ value, onChange, label, className, squarePreview = false }: Props) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,7 +53,12 @@ export default function ImageUploader({ value, onChange, label, className }: Pro
       {value ? (
         <div className="relative group mb-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="preview" className="w-full h-32 object-cover" style={{ borderRadius: "4px" }} />
+          <img
+            src={value}
+            alt="preview"
+            className={squarePreview ? "w-full max-w-56 aspect-square object-cover" : "w-full h-32 object-cover"}
+            style={{ borderRadius: "4px" }}
+          />
           <button
             onClick={() => onChange("")}
             className="absolute top-2 right-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity"

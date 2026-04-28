@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Rubro, RubroItem } from "@/types";
-import { Plus, Pencil, Trash2, X, Check, ChevronRight, Eye, EyeOff, Upload, Download } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, ChevronRight, Eye, EyeOff, Upload, Download, Copy } from "lucide-react";
 import ImageUploader from "@/components/admin/ImageUploader";
 
 async function adminPost(action: string, payload: object) {
@@ -210,6 +210,17 @@ export default function RubrosTab() {
     }
   };
 
+  const duplicateItem = (item: RubroItem) => {
+    setEditingItem({
+      ...item,
+      _new: true,
+      id: undefined,
+      name: `${item.name} copia`,
+      slug: `${item.slug || toSlug(item.name)}-copia`,
+      orden: (item.orden ?? 99) + 1,
+    });
+  };
+
   const exportItems = async (r: Rubro) => {
     const { data, error } = await supabase.from("rubro_items").select("*").eq("rubro_id", r.id).order("orden");
     if (error) {
@@ -359,81 +370,38 @@ export default function RubrosTab() {
                 Podés exportar esta categoría, editar precios, promo, stock, imágenes y SEO en CSV, y volver a importarla. Si dejás el id, actualiza; si no hay id, usa el slug para actualizar o crea uno nuevo.
               </p>
 
-              {/* New/edit item form */}
-              {editingItem && (editingItem._new || editingItem.rubro_id === r.id) && (
-                <ItemForm
-                  item={editingItem}
-                  saving={saving}
-                  onChange={setEditingItem}
-                  onSave={saveItem}
-                  onCancel={() => setEditingItem(null)}
-                  inputCls={inputCls}
-                />
-              )}
-
               {/* Items list */}
               <div className="space-y-2">
                 {(items[r.id] || []).length === 0 && !editingItem && (
                   <p className="font-body text-xs text-white/25 py-2">Sin productos cargados aún. Agregá el primero.</p>
                 )}
                 {(items[r.id] || []).map(item => (
-                  <div key={item.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "4px" }}>
-                    {editingItem && editingItem.id === item.id ? (
-                      <div className="p-3">
-                        <ItemForm
-                          item={editingItem}
-                          saving={saving}
-                          onChange={setEditingItem}
-                          onSave={saveItem}
-                          onCancel={() => setEditingItem(null)}
-                          inputCls={inputCls}
-                        />
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-3 px-3 py-2.5">
-                        {/* Thumb */}
-                        {item.image_url ? (
-                          <img src={item.image_url} alt={item.name} className="w-10 h-10 object-cover flex-shrink-0" style={{ borderRadius: "3px" }} />
-                        ) : (
-                          <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center" style={{ background: "rgba(255,255,255,0.05)", borderRadius: "3px" }}>
-                            <span className="text-white/20 text-xs">SE</span>
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="font-body text-sm text-white/80 truncate">{item.name}</p>
-                            <span className="font-body text-xs px-1.5 py-0.5 flex-shrink-0" style={{ background: "rgba(13,74,114,0.3)", color: "#9DAEBF", borderRadius: "3px" }}>
-                              {item.badge || "En construcción"}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-3 mt-0.5">
-                            {item.promo_price ? (
-                              <span className="font-body text-xs font-semibold" style={{ color: "#C41E2A" }}>
-                                ${item.promo_price.toLocaleString("es-AR")}
-                                {item.price && <span className="line-through ml-1 text-white/30">${item.price.toLocaleString("es-AR")}</span>}
-                              </span>
-                            ) : item.price ? (
-                              <span className="font-body text-xs font-semibold text-white/60">${item.price.toLocaleString("es-AR")}</span>
-                            ) : (
-                              <span className="font-body text-xs text-white/25">Sin precio</span>
-                            )}
-                            {item.stock !== null && item.stock !== undefined && (
-                              <span className="font-body text-xs text-white/35">Stock: {item.stock}</span>
-                            )}
-                            {item.description && <span className="font-body text-xs text-white/25 truncate">{item.description}</span>}
-                          </div>
-                        </div>
-                        <button onClick={() => setEditingItem({ ...item })} className="p-1.5 text-white/30 hover:text-white transition-colors"><Pencil size={12} /></button>
-                        <button onClick={() => deleteItem(item.id, r.id)} className="p-1.5 text-white/30 hover:text-red-400 transition-colors"><Trash2 size={12} /></button>
-                      </div>
-                    )}
-                  </div>
+                  <ProductRow
+                    key={item.id}
+                    item={item}
+                    active={editingItem?.id === item.id}
+                    onEdit={() => setEditingItem({ ...item })}
+                    onDuplicate={() => duplicateItem(item)}
+                    onDelete={() => deleteItem(item.id, r.id)}
+                  />
                 ))}
               </div>
             </div>
           )}
         </div>
       ))}
+
+      {editingItem && selectedRubro && (
+        <ProductEditorPanel
+          item={editingItem}
+          rubroName={rubros.find(r => r.id === selectedRubro)?.name || "Producto"}
+          saving={saving}
+          onChange={setEditingItem}
+          onSave={saveItem}
+          onCancel={() => setEditingItem(null)}
+          inputCls={inputCls}
+        />
+      )}
 
       {/* Edit rubro modal */}
       {editing && (
@@ -497,6 +465,129 @@ function toSlug(str: string) {
 
 const BADGES = ["En construcción", "Disponible", "Más usado", "Más conveniente", "Nuevo", "Oferta", "Sin stock", "Consultar precio"];
 
+function ProductRow({
+  item,
+  active,
+  onEdit,
+  onDuplicate,
+  onDelete,
+}: {
+  item: RubroItem;
+  active: boolean;
+  onEdit: () => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div
+      className="flex items-center gap-3 px-3 py-3 transition-colors"
+      style={{
+        background: active ? "rgba(13,74,114,0.22)" : "rgba(255,255,255,0.02)",
+        border: `1px solid ${active ? "rgba(13,74,114,0.55)" : "rgba(255,255,255,0.06)"}`,
+        borderRadius: "6px",
+      }}
+    >
+      {item.image_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={item.image_url} alt={item.name} className="w-14 h-14 object-cover flex-shrink-0" style={{ borderRadius: "5px" }} />
+      ) : (
+        <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center" style={{ background: "rgba(255,255,255,0.05)", borderRadius: "5px" }}>
+          <span className="text-white/20 text-xs">SE</span>
+        </div>
+      )}
+
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-body text-sm font-semibold text-white/85 truncate">{item.name}</p>
+          <span className="font-body text-xs px-1.5 py-0.5 flex-shrink-0" style={{ background: "rgba(13,74,114,0.32)", color: "#9DAEBF", borderRadius: "3px" }}>
+            {item.badge || "En construcción"}
+          </span>
+          {!item.active && (
+            <span className="font-body text-xs px-1.5 py-0.5 text-white/35" style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: "3px" }}>
+              Oculto
+            </span>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
+          {item.promo_price ? (
+            <span className="font-body text-xs font-semibold" style={{ color: "#C41E2A" }}>
+              ${item.promo_price.toLocaleString("es-AR")}
+              {item.price && <span className="line-through ml-1 text-white/30">${item.price.toLocaleString("es-AR")}</span>}
+            </span>
+          ) : item.price ? (
+            <span className="font-body text-xs font-semibold text-white/60">${item.price.toLocaleString("es-AR")}</span>
+          ) : (
+            <span className="font-body text-xs text-white/25">Sin precio</span>
+          )}
+          {item.stock !== null && item.stock !== undefined && (
+            <span className="font-body text-xs text-white/35">Stock: {item.stock}</span>
+          )}
+          {item.slug && <span className="font-body text-xs text-white/25">/productos/{item.slug}</span>}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 flex-shrink-0">
+        <button onClick={onEdit} className="p-2 text-white/35 hover:text-white transition-colors" title="Editar producto">
+          <Pencil size={14} />
+        </button>
+        <button onClick={onDuplicate} className="p-2 text-white/35 hover:text-white transition-colors" title="Duplicar producto">
+          <Copy size={14} />
+        </button>
+        <button onClick={onDelete} className="p-2 text-white/35 hover:text-red-400 transition-colors" title="Borrar producto">
+          <Trash2 size={14} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ProductEditorPanel({
+  item,
+  rubroName,
+  saving,
+  onChange,
+  onSave,
+  onCancel,
+  inputCls,
+}: {
+  item: EditingItem;
+  rubroName: string;
+  saving: boolean;
+  onChange: React.Dispatch<React.SetStateAction<EditingItem | null>>;
+  onSave: () => void;
+  onCancel: () => void;
+  inputCls: string;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end" style={{ background: "rgba(0,0,0,0.45)" }} onClick={e => { if (e.target === e.currentTarget) onCancel(); }}>
+      <aside className="h-full w-full max-w-2xl overflow-y-auto" style={{ background: "#0A1628", borderLeft: "1px solid rgba(255,255,255,0.12)", boxShadow: "-24px 0 60px rgba(0,0,0,0.35)" }}>
+        <div className="sticky top-0 z-10 px-5 py-4 flex items-center justify-between" style={{ background: "#060E1A", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <div>
+            <p className="font-body text-xs text-white/35 uppercase tracking-widest">{rubroName}</p>
+            <h3 className="font-display text-2xl text-white" style={{ letterSpacing: "0.05em" }}>
+              {item._new ? "NUEVO PRODUCTO" : "EDITAR PRODUCTO"}
+            </h3>
+          </div>
+          <button onClick={onCancel} className="text-white/40 hover:text-white p-2">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="p-5">
+          <ItemForm
+            item={item}
+            saving={saving}
+            onChange={onChange}
+            onSave={onSave}
+            onCancel={onCancel}
+            inputCls={inputCls}
+          />
+        </div>
+      </aside>
+    </div>
+  );
+}
+
 function ItemForm({
   item, saving, onChange, onSave, onCancel, inputCls
 }: {
@@ -508,12 +599,17 @@ function ItemForm({
   inputCls: string;
 }) {
   return (
-    <div className="space-y-2 p-3" style={{ background: "rgba(13,74,114,0.15)", border: "1px solid rgba(13,74,114,0.3)", borderRadius: "4px" }}>
-      {/* Row 1: nombre + badge */}
-      <div className="grid grid-cols-2 gap-2">
+    <div className="space-y-5">
+      <section className="p-4 space-y-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px" }}>
         <div>
+          <p className="font-body text-xs text-white/35 uppercase tracking-widest">Datos básicos</p>
+          <p className="font-body text-xs text-white/20 mt-0.5">Nombre, estado visible y URL pública del producto.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3">
+        <div>
+          <label className="font-body text-xs text-white/35 mb-1 block">Nombre del producto *</label>
           <input
-            placeholder="Nombre del producto *"
+            placeholder="Ej: Cemento Loma Negra"
             value={item.name || ""}
             onChange={e => {
               const v = e.target.value;
@@ -521,7 +617,19 @@ function ItemForm({
             }}
             className={inputCls}
           />
-          <label className="font-body text-xs text-white/35 mt-2 mb-1 block">URL del producto</label>
+        </div>
+        <div>
+          <label className="font-body text-xs text-white/35 mb-1 block">Estado comercial</label>
+          <select
+            value={item.badge || "En construcción"}
+            onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, badge: v } : p); }}
+            className={inputCls}
+          >
+            {BADGES.map(b => <option key={b} value={b}>{b}</option>)}
+          </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="font-body text-xs text-white/35 mb-1 block">URL del producto</label>
           <input
             placeholder="ej: porcelanato-simil-madera"
             value={item.slug || ""}
@@ -532,60 +640,39 @@ function ItemForm({
             <p className="font-body text-xs text-white/25 mt-1">/productos/{item.slug}</p>
           )}
         </div>
-        <select
-          value={item.badge || "En construcción"}
-          onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, badge: v } : p); }}
+      </div>
+      </section>
+
+      <section className="p-4 space-y-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px" }}>
+        <div>
+          <p className="font-body text-xs text-white/35 uppercase tracking-widest">Descripción</p>
+          <p className="font-body text-xs text-white/20 mt-0.5">La corta aparece en cards. La larga aparece en la página del producto.</p>
+        </div>
+        <textarea
+          placeholder="Descripción corta para cards y resumen SEO"
+          value={item.description || ""}
+          onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, description: v } : p); }}
           className={inputCls}
-        >
-          {BADGES.map(b => <option key={b} value={b}>{b}</option>)}
-        </select>
-      </div>
+          rows={3}
+          style={{ resize: "vertical" }}
+        />
 
-      {/* Row 2: descripción */}
-      <textarea
-        placeholder="Descripción corta para cards y resumen SEO"
-        value={item.description || ""}
-        onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, description: v } : p); }}
-        className={inputCls}
-        rows={2}
-        style={{ resize: "none" }}
-      />
+        <textarea
+          placeholder="Descripción larga para la página del producto"
+          value={item.long_description || ""}
+          onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, long_description: v } : p); }}
+          className={inputCls}
+          rows={5}
+          style={{ resize: "vertical" }}
+        />
+      </section>
 
-      <textarea
-        placeholder="Descripción larga para la página del producto"
-        value={item.long_description || ""}
-        onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, long_description: v } : p); }}
-        className={inputCls}
-        rows={4}
-        style={{ resize: "vertical" }}
-      />
-
-      <div className="grid grid-cols-2 gap-2">
+      <section className="p-4 space-y-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px" }}>
         <div>
-          <label className="font-body text-xs text-white/35 mb-1 block">Título SEO</label>
-          <input
-            placeholder="Ej: Porcellanato en Temperley | San Eduardo"
-            value={item.seo_title || ""}
-            onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, seo_title: v } : p); }}
-            className={inputCls}
-          />
+          <p className="font-body text-xs text-white/35 uppercase tracking-widest">Precio y stock</p>
+          <p className="font-body text-xs text-white/20 mt-0.5">Dejá vacío si preferís mostrar “consultar precio”.</p>
         </div>
-        <div>
-          <label className="font-body text-xs text-white/35 mb-1 block">Meta descripción</label>
-          <textarea
-            placeholder="Texto para Google, ideal 140-160 caracteres"
-            value={item.meta_description || ""}
-            onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, meta_description: v } : p); }}
-            className={inputCls}
-            rows={2}
-            style={{ resize: "none" }}
-          />
-          <p className="font-body text-xs text-white/25 mt-1">{(item.meta_description || "").length}/160</p>
-        </div>
-      </div>
-
-      {/* Row 3: precios */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid sm:grid-cols-3 gap-3">
         <div>
           <label className="font-body text-xs text-white/35 mb-1 block">Precio ($)</label>
           <input
@@ -617,26 +704,60 @@ function ItemForm({
           />
         </div>
       </div>
+      </section>
 
-      {/* Row 4: imagen */}
-      <ImageUploader
-        value={item.image_url || ""}
-        onChange={url => onChange(p => p ? { ...p, image_url: url } : p)}
-        label="Imagen del producto · recomendado cuadrada 1:1"
-      />
+      <section className="p-4 space-y-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px" }}>
+        <div>
+          <p className="font-body text-xs text-white/35 uppercase tracking-widest">Imagen</p>
+          <p className="font-body text-xs text-white/20 mt-0.5">Recomendado: cuadrada 1:1, mínimo 800x800. Se recorta sin deformarse.</p>
+        </div>
+        <ImageUploader
+          value={item.image_url || ""}
+          onChange={url => onChange(p => p ? { ...p, image_url: url } : p)}
+          label="Imagen del producto"
+          squarePreview
+        />
+      </section>
+
+      <details className="p-4" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px" }}>
+        <summary className="font-body text-xs text-white/45 uppercase tracking-widest cursor-pointer">SEO avanzado</summary>
+        <div className="grid sm:grid-cols-2 gap-3 mt-4">
+          <div>
+            <label className="font-body text-xs text-white/35 mb-1 block">Título SEO</label>
+            <input
+              placeholder="Ej: Porcellanato en Temperley | San Eduardo"
+              value={item.seo_title || ""}
+              onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, seo_title: v } : p); }}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className="font-body text-xs text-white/35 mb-1 block">Meta descripción</label>
+            <textarea
+              placeholder="Texto para Google, ideal 140-160 caracteres"
+              value={item.meta_description || ""}
+              onChange={e => { const v = e.target.value; onChange(p => p ? { ...p, meta_description: v } : p); }}
+              className={inputCls}
+              rows={3}
+              style={{ resize: "vertical" }}
+            />
+            <p className="font-body text-xs text-white/25 mt-1">{(item.meta_description || "").length}/160</p>
+          </div>
+        </div>
+      </details>
 
       {/* Actions */}
-      <div className="flex gap-2 justify-end pt-1">
-        <button onClick={onCancel} className="font-body text-xs text-white/40 px-3 py-1.5">
-          <X size={12} />
+      <div className="sticky bottom-0 flex gap-2 justify-end p-4 -mx-5 -mb-5" style={{ background: "#060E1A", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <button onClick={onCancel} className="font-body text-sm text-white/45 px-4 py-2 hover:text-white">
+          Cancelar
         </button>
         <button
           onClick={onSave}
           disabled={saving || !item.name}
-          className="flex items-center gap-1 font-body text-xs font-semibold text-white px-4 py-1.5 disabled:opacity-40"
-          style={{ background: "#0D4A72", borderRadius: "3px" }}
+          className="flex items-center gap-2 font-body text-sm font-semibold text-white px-5 py-2.5 disabled:opacity-40"
+          style={{ background: "#0D4A72", borderRadius: "4px" }}
         >
-          <Check size={12} /> {saving ? "Guardando..." : "Guardar producto"}
+          <Check size={14} /> {saving ? "Guardando..." : "Guardar producto"}
         </button>
       </div>
     </div>
